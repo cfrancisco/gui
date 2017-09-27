@@ -24,6 +24,7 @@ export default (
         <Route path="device" name="Devices">
           <IndexRoute component={DeviceDashboard} />
           <Route path="list" name="Device list" component={Devices} />
+          <Route path="maps" name="Device list" component={DevMaps} />
           <Route path="stats" name="Device Dashboard" component={DeviceDashboard} />
           <Route path="new" name="" component={NewDevice} />
           <Route path="id/:device/detail" name="Device detail" component={ViewDevice} />
