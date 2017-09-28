@@ -5,7 +5,7 @@ import Login from './containers/login/';
 import Dashboard from './views/dashboard/';
 import Full from './containers/full/';
 
-import { Devices, ViewDevice, NewDevice }  from './views/devices';
+import { DevMaps, Devices, ViewDevice, NewDevice }  from './views/devices';
 import DeviceDashboard from './views/dashboard/DeviceDashboard';
 
 import { TemplateList, NewTemplate } from './views/templates';
@@ -24,7 +24,7 @@ export default (
         <Route path="device" name="Devices">
           <IndexRoute component={DeviceDashboard} />
           <Route path="list" name="Device list" component={Devices} />
-          <Route path="maps" name="Device list" component={DevMaps} />
+          <Route path="maps" name="Device maps" component={DevMaps} />
           <Route path="stats" name="Device Dashboard" component={DeviceDashboard} />
           <Route path="new" name="" component={NewDevice} />
           <Route path="id/:device/detail" name="Device detail" component={ViewDevice} />
