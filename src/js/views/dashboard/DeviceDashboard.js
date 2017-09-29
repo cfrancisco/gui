@@ -1,7 +1,12 @@
 import React, { Component } from 'react';
+import Leaflet from 'leaflet'
+
 import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 import { Link } from 'react-router'
+
 import SimpleExample from './simple'
+import VectorLayersExample from './vector-layers'
+import OtherLayersExample from './other-layers'
 
 import alt from '../../alt';
 import AltContainer from 'alt-container';
@@ -10,6 +15,9 @@ import util from '../../comms/util/util';
 
 import { Line } from 'react-chartjs-2';
 import { Map, Marker, Popup, TileLayer } from 'react-leaflet';
+
+Leaflet.Icon.Default.imagePath =
+  '//cdnjs.cloudflare.com/ajax/libs/leaflet/1.2.0/images/'
 
 
 var DeviceDashboardStore = require('../../stores/DeviceDashboardStore');
@@ -296,6 +304,10 @@ class DeviceDashboardImpl extends Component {
       	<h1>React-Leaflet examples</h1>
         <h2>Popup with Marker</h2>
          <SimpleExample />
+         <h2>Vector layers</h2>
+         <VectorLayersExample />
+         <h2>Other layers</h2>
+         <OtherLayersExample />
       </div>
       </ReactCSSTransitionGroup>
     );
