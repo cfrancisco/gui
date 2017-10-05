@@ -1,24 +1,11 @@
 import React, { Component } from 'react';
-import Leaflet from 'leaflet'
-
 import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 import { Link } from 'react-router'
-
-import SimpleExample from './simple'
-import VectorLayersExample from './vector-layers'
-import OtherLayersExample from './other-layers'
 
 import alt from '../../alt';
 import AltContainer from 'alt-container';
 import LoginStore from '../../stores/LoginStore';
 import util from '../../comms/util/util';
-
-import { Line } from 'react-chartjs-2';
-import { Map, Marker, Popup, TileLayer } from 'react-leaflet';
-
-Leaflet.Icon.Default.imagePath =
-  '//cdnjs.cloudflare.com/ajax/libs/leaflet/1.2.0/images/'
-
 
 var DeviceDashboardStore = require('../../stores/DeviceDashboardStore');
 var DeviceDashboardActions = require('../../actions/DeviceDashboardActions');
@@ -88,36 +75,6 @@ class TemplateItem extends Component {
     )
   }
 }
-
-
-class PainelMaps extends Component {
-   constructor(props) {
-      super(props);
-    }
-
-    render() {
-
-    //  let pos = this.props.value.attrValue;
-      //let parsed = pos.match(/^([+-]?\d+(\.\d+)?)\s*[,]\s*([+-]?\d+(\.\d+)?)$/)
-      // this.props.devices
-      //const position = [parseFloat(parsed[1]),parseFloat(parsed[3])];
-      const position = [51.505, -0.09];
-
-      return (
-        <div className="full-height col s12 m12">
-          <Map center={position} zoom={19}>
-            <TileLayer
-              url='http://{s}.tile.osm.org/{z}/{x}/{y}.png'
-              attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-            />
-            <Marker position={position}></Marker>
-          </Map>
-        </div>
-
-      )
-  }
-}
-
 
 class ElementList extends Component {
   constructor(props) {
@@ -301,13 +258,8 @@ class DeviceDashboardImpl extends Component {
       transitionEnterTimeout={500}
       transitionLeaveTimeout={500} >
       <div className="row main-painel">
-      	<h1>React-Leaflet examples</h1>
-        <h2>Popup with Marker</h2>
-         <SimpleExample />
-         <h2>Vector layers</h2>
-         <VectorLayersExample />
-         <h2>Other layers</h2>
-         <OtherLayersExample />
+         <LeftPainel id='div_devices' mainTitle="Devices" subtitle="Dashboard" stats={this.props.devices.stats} />
+         <MainPainel devices={this.props.devices.last_devices} templates={this.props.devices.last_templates} />
       </div>
       </ReactCSSTransitionGroup>
     );
