@@ -1,3 +1,21 @@
+.layer-div{
+    width:55px;
+    height:55px;
+    display: inline-block;
+    cursor: pointer;
+    position: absolute;
+    right: 20px;
+    z-index: 450;
+    top:20px;
+
+    img{
+      width: 100%;
+      height: 100%;
+    }
+}
+
+
+
 .icon-marker {
   padding: 3px;
   margin: 0 auto;

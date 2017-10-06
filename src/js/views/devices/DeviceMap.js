@@ -7,8 +7,8 @@ import DeviceStore from '../../stores/DeviceStore';
 import DeviceActions from '../../actions/DeviceActions';
 import TemplateStore from '../../stores/TemplateStore';
 import TemplateActions from '../../actions/TemplateActions';
-import MeasureStore from '../../stores/MeasureStore';
 import MeasureActions from '../../actions/MeasureActions';
+import MeasureStore from '../../stores/MeasureStore';
 
 import { PageHeader } from "../../containers/full/PageHeader";
 
@@ -17,10 +17,19 @@ import AltContainer from 'alt-container';
 import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 import { Link } from 'react-router'
 
-import { Map, Marker, Popup, TileLayer, Tooltip } from 'react-leaflet';
+import { LayerGroup, LayersControl, Map, TileLayer, Marker, Popup,Tooltip } from 'react-leaflet';
 import { divIcon } from 'leaflet';
+// import { kml} from '../../components/KML';
+import { ImageOverlay , latLngBounds } from 'react-leaflet'
 
 import ReactResizeDetector from 'react-resize-detector';
+
+// var kmlLayer = new L.KML("images/layers/doc.kml", {async: true});
+// console.log(kmlLayer);
+
+// kmlLayer.on("loaded", function(e) {
+			// map.fitBounds(e.target.getBounds());
+		// });
 
 
 var darkBluePin = L.divIcon({className: 'icon-marker bg-dark-blue'});
@@ -37,19 +46,22 @@ class PositionRenderer extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      zoom: 13,
-      visible: false,
+			layerLoaded: false,
+		  visible: false,
       selected_device_id : -1,
     }
 
     this._handleClick = this._handleClick.bind(this);
     this._handleMoveStart = this._handleMoveStart.bind(this);
     this._handleContextMenu = this._handleContextMenu.bind(this);
-    this.handleTracking = this.handleTracking.bind(this);
+    this._handleTracking = this._handleTracking.bind(this);
   }
 
-  handleTracking() {
-    console.log("request last hour from device: ",  this.state.selected_device_id);
+  _handleTracking() {
+		const layer = this.state.layerLoaded;
+		console.log("Layer: ",layer);
+		this.setState({ layerLoaded: !layer, });
+		console.log("request last hour from device: ",  this.state.selected_device_id);
   }
   // context menu based at
   // https://codepen.io/devhamsters/pen/yMProm
@@ -69,15 +81,15 @@ class PositionRenderer extends Component {
      if (visible) this.setState({ visible: false, });
   };
 
-  _handleContextMenu(e) {
+  _handleContextMenu(e, device_id) {
     console.log("openContextMenu");
+
     event = e.originalEvent;
     event.preventDefault();
     console.log(e);
 
-    // @TODO we need a better way to get the selected device id
-    const dev_id = e.target.options.id.split("_")[1];
-    this.setState({ visible: true , selected_device_id: parseInt(dev_id)});
+    console.log(device_id);
+    this.setState({ visible: true , selected_device_id: parseInt(device_id)});
 
     // this.refs.map.leafletElement.locate()
     const clickX = event.clientX;
@@ -104,8 +116,14 @@ class PositionRenderer extends Component {
 
   resize() {
     if (this.leafletMap !== undefined) {
-      this.leafletMap.leafletElement.invalidateSize();
-    }
+      	this.leafletMap.leafletElement.invalidateSize();
+    		console.log("this.leafletMap",this.leafletMap);
+    		// this.leafletMap.addLayer(kmlLayer);
+				// (this.props.layerGroup || this.props.map).addLayer(this.leafletElement);
+			//  layerContainer
+    		// this.leafletMap.addControl(new L.Control.Layers({}, {'Track':kmlLayer}));
+      }
+
   }
 
   render() {
@@ -174,20 +192,24 @@ class PositionRenderer extends Component {
                 <Link to={"/device/id/" + this.state.selected_device_id + "/detail"} title="View details">
                 <div className="contextMenu--option"><i className="fa fa-fa-info-circle" />Details</div>
                 </Link>
-                <div className="contextMenu--option"  onClick={this.handleTracking}><i className="fa fa-compass" />Tracking</div>
+                <div className="contextMenu--option"  onClick={this._handleTracking}><i className="fa fa-compass" />Tracking</div>
             </div>
           ) : null
 
+      // className={this.state.layerLoaded ? 'w100' : 'w99'}
     return (
-      <Map center={parsedEntries[0].pos} zoom={13} ref={m => {this.leafletMap = m;}}   onContextMenu={this._handleClick}  onMoveStart={this._handleMoveStart} >
+	      <Map center={parsedEntries[0].pos} zoom={13} ref={m => {this.leafletMap = m;}}   onContextMenu={this._handleClick}  onMoveStart={this._handleMoveStart}>
+        <LayerBox> </LayerBox>
         {contextMenu}
         <ReactResizeDetector handleWidth onResize={this.resize.bind(this)} />
         <TileLayer
-          url='http://{s}.tile.osm.org/{z}/{x}/{y}.png'
-          attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+          url='https://api.mapbox.com/styles/v1/mapbox/streets-v10/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1IjoiY2ZyYW5jaXNjbyIsImEiOiJjajhrN3VlYmowYXNpMndzN2o2OWY1MGEwIn0.xPCJwpMTrID9uOgPGK8ntg'
+          attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> and Mapbox contributors'
         />
         {parsedEntries.map((k) => (
-          <Marker id={"dev_"+k.id} onContextMenu={this._handleContextMenu} position={k.pos} key={k.id} icon={k.pin}  >
+          <Marker
+           onContextMenu={(e) => { this._handleContextMenu(e, k.id); }}
+           position={k.pos} key={k.id} icon={k.pin}  >
           <Tooltip>
             <span>
              {k.id }: {k.name}
@@ -297,6 +319,44 @@ class DeviceList extends Component {
     )
   }
 }
+
+class LayerBox extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {visible:true};
+    this.toggleLayer = this.toggleLayer.bind(this);
+  }
+
+  toggleLayer() {
+    console.log("togglle ")
+    this.setState({visible:!this.state.visible});
+  }
+
+  render() {
+
+    const layerMapBounds = L.latLngBounds([
+        [-20.90974,-48.83651],
+        [-21.80963,-47.11802]
+    ]);
+    const layerOpacity = 0.7;
+    const imageoverlay = this.state.visible ? (
+      <ImageOverlay
+        opacity={layerOpacity}
+        bounds={layerMapBounds}
+        url='images/layers/files/Combined.png'
+      /> ) : null
+
+    return (
+      <div className="col s12">
+        <div className="layer-div" onClick={this.toggleLayer}>
+          <img src='images/layers.ico' />
+        </div>
+        {imageoverlay}
+      </div>
+    )
+  }
+}
+
 
 class DeviceMap extends Component {
 
