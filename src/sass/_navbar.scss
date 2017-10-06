@@ -1,10 +1,13 @@
 nav.outer-header {
   position: fixed;
   top: 0;
-  z-index: 9999;
+  color: #4e4e4e;
+  z-index: 1009;
   height: $header-height !important;
   background: linear-gradient(to right, #588de7, #65ce8f);
   font-family: Roboto, sans-serif;
+  // background: linear-gradient(90deg, #F8F8F8 12.84%, #FFFFFF 70.07%);
+
 
   a {
     padding-left: 40px;

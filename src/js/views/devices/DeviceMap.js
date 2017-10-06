@@ -10,6 +10,8 @@ import TemplateActions from '../../actions/TemplateActions';
 import MeasureActions from '../../actions/MeasureActions';
 import MeasureStore from '../../stores/MeasureStore';
 
+import { SideBar } from '../devices/Devices';
+
 import { PageHeader } from "../../containers/full/PageHeader";
 
 import AltContainer from 'alt-container';
@@ -23,6 +25,9 @@ import { divIcon } from 'leaflet';
 import { ImageOverlay , latLngBounds } from 'react-leaflet'
 
 import ReactResizeDetector from 'react-resize-detector';
+
+import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
+import Toggle from 'material-ui/Toggle';
 
 // var kmlLayer = new L.KML("images/layers/doc.kml", {async: true});
 // console.log(kmlLayer);
@@ -236,7 +241,7 @@ class MapRender extends Component {
   render () {
     return (
       <AltContainer stores={{measures: MeasureStore, devices: DeviceStore}}>
-        <PositionRenderer points={this.props.devices}/>
+      <PositionRenderer points={this.props.devices}/>
       </AltContainer>
     )
   }
@@ -249,14 +254,30 @@ class DeviceList extends Component {
     this.state = {
       isDisplayList: true,
       filter: '',
+      showing_map: true,
     };
 
     this.handleViewChange = this.handleViewChange.bind(this);
     this.applyFiltering = this.applyFiltering.bind(this);
+    this.checkingClick = this.checkingClick.bind(this);
+
+  }
+
+  checkingClick(event) {
+    console.log("checkingClick");
   }
 
   handleViewChange(event) {
     this.setState({isDisplayList: ! this.state.isDisplayList})
+  }
+
+  toggleMaps(event, isInputChecked)
+  {
+     console.log("isInputChecked",isInputChecked);
+     this.setState({
+       showing_map: isInputChecked,
+     })
+
   }
 
   applyFiltering(deviceMap) {
@@ -299,26 +320,69 @@ class DeviceList extends Component {
     }
     console.log('devices with geolocation: ',positionList);
 
+    const device_icon  = (<img src='images/icons/chip.png' />)
+    const location_icon  = (<img src='images/icons/location.png' />)
+    const location_active_icon  = (<img src='images/icons/location_active.png' />)
+    // const device_icon = (<i className={"fa fa-"+props.icon}/>)
+
+    const map_toggle_icon  = (<img src='images/icons/pin.png' />)
+    const grid_toggle_icon  = (<img src='images/icons/grid.png'  />)
+
+
     return (
       <div className = "flex-wrapper">
-        <div className="row z-depth-2 devicesSubHeader p0" id="inner-header">
-          <div className="col s4 m4 main-title"></div>
-          <div className= "col s2 m2 header-info hide-on-small-only">
-            <div className= "title"># Devices</div>
-            <div className= "subtitle">{filteredList.length}</div>
+        <div className="row z-depth-2 devicesSubHeader" id="inner-header">
+          <SubHeaderItem text={"Showing "+ filteredList.length + " devices "} icon={device_icon} active='false' clickable='false' />
+          <SubHeaderItem text="No tracking actived" icon={location_icon} active='false' clickable='false'  onClick='false'/>
+          <SubHeaderItem text="ID: XPTO" icon={location_active_icon} active='true' clickable='true'  onClick={this.checkingClick} />
+
+          <div className="box-sh">
+           <div className='toggle-icon'>
+            {map_toggle_icon}
+           </div>
+           <div className='toggle-map'>
+           <MuiThemeProvider>
+            <Toggle label="" onToggle={this.toggleMaps}/>
+           </MuiThemeProvider>
+           </div>
+           <div className='toggle-icon'>
+            {grid_toggle_icon}
+           </div>
+
           </div>
+
+          <div className="box-sh">
           <Link to="/device/new" title="Create a new device" className="waves-effect waves-light btn-flat">
             New Device
           </Link>
+          </div>
         </div>
 
-        <div className="deviceMapCanvas col m10 s12 offset-m1">
-          <MapRender devices={positionList} />
-        </div>
-      </div>
+        <div className="deviceMapCanvas col m12 s12">
+             <MapRender devices={positionList} />
+          </div>
+          <div className="col devicePainel">
+            <SideBar devices={this.props.devices} />
+           </div>
+         </div>
     )
   }
 }
+
+
+function SubHeaderItem(props) {
+  return (
+    <div className={"box-sh-item" + (props.active === 'true' ? " active" : " inactive") }>
+      <div className="icon">
+      {props.icon}
+      </div>
+      <div className="text">
+        {props.text}
+      </div>
+    </div>
+  )
+}
+
 
 class LayerBox extends Component {
   constructor(props) {
@@ -328,7 +392,7 @@ class LayerBox extends Component {
   }
 
   toggleLayer() {
-    console.log("togglle ")
+    console.log("toggling ")
     this.setState({visible:!this.state.visible});
   }
 
@@ -349,7 +413,7 @@ class LayerBox extends Component {
     return (
       <div className="col s12">
         <div className="layer-div" onClick={this.toggleLayer}>
-          <img src='images/layers.ico' />
+          <img src='images/layers.png' />
         </div>
         {imageoverlay}
       </div>
@@ -382,7 +446,6 @@ class DeviceMap extends Component {
         transitionAppearTimeout={500}
         transitionEnterTimeout={500}
         transitionLeaveTimeout={500} >
-        <PageHeader title="device manager" subtitle="Devices" shadow='true' />
         <AltContainer store={DeviceStore}>
           <DeviceList deviceid={detail}/>
         </AltContainer>

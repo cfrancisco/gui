@@ -56,7 +56,7 @@ class SummaryItem extends Component{
 
     return(
       <div className="lst-entry-title col s12" title="See details">
-        <a className="waves-effect waves-light">
+        <div className="waves-effect waves-light">
           <div className="img col s3" id="img-chip">
             <img src="images/chip.png" />
           </div>
@@ -65,7 +65,7 @@ class SummaryItem extends Component{
             <div className="col s3 img" id="device-view">
               <a className="waves-effect waves-light" onClick={this.hideDevice}><i className={showOrHideDevice} aria-hidden="true"></i></a>
             </div>
-        </a>
+        </div>
       </div>
     )
   }
@@ -513,13 +513,13 @@ class SideBar extends Component {
 
   render(){
     return (
-      <span>
+      <div className="col s3">
         {this.state.click ? (
           <Filter devices={this.props.devices} callback={this.changeSideBar}/>
         ) : (
           <List devices={this.props.devices} callback={this.changeSideBar}/>
         )}
-      </span>
+      </div>
     )
   }
 }
@@ -567,4 +567,4 @@ class Devices extends Component {
   }
 }
 
-export { Devices };
+export { Devices, SideBar };

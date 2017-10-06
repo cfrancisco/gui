@@ -7,10 +7,11 @@
   position: fixed;
   left: 0;
   top: 0;
-  z-index: 999;
+  z-index: 1010;
   width: $sidebar-width-closed;
-  height: calc(100% - #{$header-height});
-  margin-top: $header-height;
+  height:100%;
+  // height: calc(100% - #{$header-height});
+  // margin-top: $header-height;
   border-right: 1px solid #c1c1c1 !important;
   color: #fff;
   background-color: $sidebar-bg;
@@ -26,10 +27,11 @@
 
   .header {
     color: #ccc; // TODO add this to color scheme
-    height: $header-height;
+    height: 40px;
+    // height: $header-height;
 
     >span {
-      line-height: $header-height;
+      line-height: 40px;
       font-family: 'Roboto', sans-serif;
       font-weight: bold;
       padding-left: 10px;
@@ -39,7 +41,7 @@
     .action {
       position: absolute;
       width: $header-height;
-      height: $header-height;
+      height: 40px;
       right: 0;
     }
 

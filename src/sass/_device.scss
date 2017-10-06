@@ -1,20 +1,109 @@
+
+.toggle-icon
+{
+    width: 17px;
+    height: auto;
+    display: inline-block;
+    margin: 0px 3px;
+    float:left;
+
+    img
+    {
+      width: 100%;
+      height: auto;
+    }
+}
+
+.toggle-map
+{
+  width: 56px;
+  float: left;
+  display: inline-block;
+}
+
+
+.box-sh
+{
+    padding: 20px;
+    width: auto;
+    position: relative;
+    height: 100%;
+    display: inline-block;
+    float: right;
+}
+
+
+
+  .box-sh-item.active {
+      border-bottom: 5px solid #425A8D;
+      color: #425A8D;
+}
+
+.box-sh-item {
+    padding: 10px;
+    width: auto;
+    border-bottom: 5px solid #BDBDBD;
+    color: #828282;
+    height: 100%;
+    display: inline-block;
+    float: left;
+    padding-top: 16px;
+    margin: 0px 10px;
+
+  .icon
+  {
+    width: 26px;
+    display: inline-block;
+    float: left;
+    height: 100%;
+    position: relative;
+    padding-top: 3px;
+
+    img {
+          width: 100%;
+    }
+  }
+
+
+  .text
+  {
+    display: inline-block;
+    padding-left: 10px;
+    float: left;
+    text-transform: uppercase;
+    margin: 7px;
+  }
+}
+
 .rightSidebar{
   left: 100%;
 }
 
-
+.devicePainel
+{
+    position: absolute;
+    z-index: 999;
+    background: white;
+    right: 0px;
+    display:inline-block;
+    top: 108px;
+    width: 400px;
+}
 .device-list{
-  width: 25%;
-  height: 86.75%;
+  width: 100%;
+  height: 100%;
   float: right;
   border-left: 1px solid #BDBDBD;
   border-right: 1px solid #BDBDBD;
   overflow:auto;
 
   .main-title{
-    color: #DADADA;
     font-family: 'Open Sans', sans-serif;
-    font-size: 1.5em;
+    font-weight: bold;
+    font-size: 13px;
+    text-align: center;
+    letter-spacing: 0.39px;
+    text-transform: uppercase;
   }
 
   .info-header{
@@ -464,25 +553,27 @@ h1, h2, p {
 }
 
 
+
+
 .devicesSubHeader {
+    background: #f1f1f1;
+    box-shadow: 0px 7px 13px rgba(0, 0, 0, 0.25);
+    font-family: 'Roboto', 'Droid Sans', sans-serif;
+    font-style: normal;
+    font-weight: bold;
+    font-size: 13px;
+    letter-spacing: 0.52px;
+    color: #666;
+    margin: 0;
+    z-index: 1000;
+    position: relative;
+    width: 100%;
+    height: 65px;
+    display: inline-block;
+    animation-name: height-opacity-0-to-100;
+    animation-duration: 1.5s;
+    animation-iteration-count: 1;
 
-  background-color: #fff;;
-  padding-top:10px;
-  padding-bottom:62px;
-  font-size: 16pt;
-  font-family: 'Droid Sans', sans-serif;
-  color: #666;
-  margin: 0;
-  z-index: 1000;
-  overflow: hidden;
-
-  position: relative;
-  width: 100%;
-  height: $page-header-size;
-  animation-name: height-opacity-0-to-100;
-  animation-duration: 1.5s;
-  animation-iteration-count: 1;
-  bottom:5px;
 
   .main-title{
     font-family: 'Raleway', sans-serif;
@@ -527,7 +618,29 @@ h1, h2, p {
       }
   }
 
-  .devicesSubHeader{
+  .devicesSubHeader {
+      background: #f1f1f1;
+      box-shadow: 0px 7px 13px rgba(0, 0, 0, 0.25);
+      /* padding: 0px; */
+      /* padding-top: 10px; */
+      /* padding-bottom: 62px; */
+      font-family: 'Roboto', 'Droid Sans', sans-serif;
+      font-style: normal;
+      font-weight: bold;
+      font-size: 13px;
+      letter-spacing: 0.52px;
+      color: #666;
+      margin: 0;
+      z-index: 1000;
+      /* overflow: hidden; */
+      position: relative;
+      width: 100%;
+      height: 65px;
+      display: inline-block;
+      animation-name: height-opacity-0-to-100;
+      animation-duration: 1.5s;
+      animation-iteration-count: 1;
+
     .main-title{
       padding-left: 0em;
     }
