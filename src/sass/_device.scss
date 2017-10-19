@@ -7,6 +7,11 @@
     margin: 0px 3px;
     float:left;
 
+    i
+    {
+        font-size: 21px;
+    }
+
     img
     {
       width: 100%;
@@ -516,7 +521,8 @@
 .icon-marker {
   padding: 3px;
   margin: 0 auto;
-  box-shadow: 0px 0px 7px 6px lightgray;
+  border: 1px solid $black;
+  // box-shadow: 0px 0px 7px 6px lightgray;
   border-radius: 50%;
 }
 

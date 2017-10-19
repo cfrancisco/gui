@@ -9,8 +9,6 @@ import TemplateStore from '../../stores/TemplateStore';
 import TemplateActions from '../../actions/TemplateActions';
 import MeasureActions from '../../actions/MeasureActions';
 import MeasureStore from '../../stores/MeasureStore';
-import SideBar from "../../components/DeviceFilterMenu";
-import {SubHeader, SubHeaderItem} from "../../components/SubHeader";
 
 import { PageHeader } from "../../containers/full/PageHeader";
 
@@ -19,11 +17,20 @@ import AltContainer from 'alt-container';
 import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 import { Link } from 'react-router'
 
-import { LayerGroup, LayersControl, Map, TileLayer, Marker, Popup,Tooltip, Point } from 'react-leaflet';
+import { LayerGroup, LayersControl, Map, TileLayer, Marker, Popup,Tooltip } from 'react-leaflet';
 import { divIcon } from 'leaflet';
+// import { kml} from '../../components/KML';
 import { ImageOverlay , latLngBounds } from 'react-leaflet'
 
 import ReactResizeDetector from 'react-resize-detector';
+
+// var kmlLayer = new L.KML("images/layers/doc.kml", {async: true});
+// console.log(kmlLayer);
+
+// kmlLayer.on("loaded", function(e) {
+			// map.fitBounds(e.target.getBounds());
+		// });
+
 
 var darkBluePin = L.divIcon({className: 'icon-marker bg-dark-blue'});
 var lightBluePin = L.divIcon({className: 'icon-marker bg-light-blue'});
@@ -33,32 +40,34 @@ var orangePin = L.divIcon({className: 'icon-marker bg-orange'});
 var blackPin = L.divIcon({className: 'icon-marker bg-black'});
 var redPin = L.divIcon({className: 'icon-marker bg-red'});
 
+
+
 class PositionRenderer extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      layerLoaded: false,
-      visible: false,
+			layerLoaded: false,
+		  visible: false,
       selected_device_id : -1,
-      isTerrain: false,
     }
 
     this._handleClick = this._handleClick.bind(this);
     this._handleMoveStart = this._handleMoveStart.bind(this);
     this._handleContextMenu = this._handleContextMenu.bind(this);
     this._handleTracking = this._handleTracking.bind(this);
-
-    this.setTiles = this.setTiles.bind(this);
   }
 
   _handleTracking() {
-    const layer = this.state.layerLoaded;
-    this.setState({ layerLoaded: !layer, });
+		const layer = this.state.layerLoaded;
+		console.log("Layer: ",layer);
+		this.setState({ layerLoaded: !layer, });
+		console.log("request last hour from device: ",  this.state.selected_device_id);
   }
   // context menu based at
   // https://codepen.io/devhamsters/pen/yMProm
 
   _handleClick(e) {
+      console.log("on click");
       const visible = this.state.visible;
       event = e.originalEvent;
       const wasOutside = !(event.target.contains === this.root);
@@ -67,15 +76,19 @@ class PositionRenderer extends Component {
   };
 
   _handleMoveStart() {
+     console.log("_handleMoveStart");
      const visible = this.state.visible;
      if (visible) this.setState({ visible: false, });
   };
 
   _handleContextMenu(e, device_id) {
+    console.log("openContextMenu");
 
     event = e.originalEvent;
     event.preventDefault();
+    console.log(e);
 
+    console.log(device_id);
     this.setState({ visible: true , selected_device_id: parseInt(device_id)});
 
     // this.refs.map.leafletElement.locate()
@@ -103,12 +116,14 @@ class PositionRenderer extends Component {
 
   resize() {
     if (this.leafletMap !== undefined) {
-      this.leafletMap.leafletElement.invalidateSize();
-    }
-  }
+      	this.leafletMap.leafletElement.invalidateSize();
+    		console.log("this.leafletMap",this.leafletMap);
+    		// this.leafletMap.addLayer(kmlLayer);
+				// (this.props.layerGroup || this.props.map).addLayer(this.leafletElement);
+			//  layerContainer
+    		// this.leafletMap.addControl(new L.Control.Layers({}, {'Track':kmlLayer}));
+      }
 
-  setTiles(isMap) {
-    this.setState({isTerrain: isMap});
   }
 
   render() {
@@ -123,56 +138,74 @@ class PositionRenderer extends Component {
       )
     }
 
-    function parsePosLatLng(p) {
-      return [22.1,22.2];
-    }
+    function parsePos(value) {
+      if (value === undefined) {
+        return null;
+      }
 
-    function getPinColor(p) {
-      return darkBluePin;
+      let parsed = value.match(/^([+-]?\d+(\.\d+)?)\s*[,]\s*([+-]?\d+(\.\d+)?)$/)
+      if (parsed == null) {
+        return null;
+      }
+
+      return [parseFloat(parsed[1]),parseFloat(parsed[3])];
     }
 
     let deviceData = this.props.devices.devices;
+    function getValue(p) {
+      if (p.static) {
+        return deviceData[p.id].static_attrs.filter(function(k){
+            return k.name == p.geo;
+          })[0].value;
+      } else {
+        // TODO
+      }
+    }
+
+    function getPinColor(p)
+    {
+      // TODO: check deviceData[p.id]
+      return darkBluePin;
+    }
+
+
     let parsedEntries = this.props.points.map((k) => {
-      let pos = parsePosLatLng(k);
+      let pos = parsePos(getValue(k));
+      console.log("deviceData[p.id]",deviceData[k.id]);
+      let pinIcon = getPinColor(k);
       if (pos !== null) {
-        let pinIcon = getPinColor(k);
         return {id:k.id, pos:pos, pin:pinIcon, name: deviceData[k.id].label};
       }
+
       return undefined;
     });
 
+    console.log('entries', parsedEntries);
 
     if (parsedEntries.length == 0) {
       return (<NoData />);
     }
     const contextMenu = this.state.visible ? (
-      <div ref={ref => {this.root = ref}} className="contextMenu">
-          <div className="contextMenu--option">State : </div>
-          <div className="contextMenu--separator" />
-          <Link to={"/device/id/" + this.state.selected_device_id + "/detail"} title="View details">
-            <div className="contextMenu--option"><i className="fa fa-fa-info-circle" />Details</div>
-          </Link>
-          <div className="contextMenu--option"  onClick={this._handleTracking}><i className="fa fa-compass" />Tracking</div>
-      </div>
-    ) : null
+            <div ref={ref => {this.root = ref}} className="contextMenu">
+                <div className="contextMenu--option">State : </div>
+                <div className="contextMenu--separator" />
+                <Link to={"/device/id/" + this.state.selected_device_id + "/detail"} title="View details">
+                <div className="contextMenu--option"><i className="fa fa-fa-info-circle" />Details</div>
+                </Link>
+                <div className="contextMenu--option"  onClick={this._handleTracking}><i className="fa fa-compass" />Tracking</div>
+            </div>
+          ) : null
 
+      // className={this.state.layerLoaded ? 'w100' : 'w99'}
     return (
-      <Map center={parsedEntries[0].pos} zoom={13} ref={m => {this.leafletMap = m;}}   onContextMenu={this._handleClick}  onMoveStart={this._handleMoveStart}>
+	      <Map center={parsedEntries[0].pos} zoom={13} ref={m => {this.leafletMap = m;}}   onContextMenu={this._handleClick}  onMoveStart={this._handleMoveStart}>
         <LayerBox> </LayerBox>
         {contextMenu}
         <ReactResizeDetector handleWidth onResize={this.resize.bind(this)} />
-        <div className="mapOptions col s12">
-          <div className="mapView" onClick = {() => this.setTiles(true)}>Terrain</div>
-          <div className="satelliteView" onClick = {() => this.setTiles(false)}>Satellite</div>
-        </div>
-        {this.state.isTerrain ? (
-          <TileLayer url = 'https://api.mapbox.com/styles/v1/mapbox/streets-v10/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1IjoiY2ZyYW5jaXNjbyIsImEiOiJjajhrN3VlYmowYXNpMndzN2o2OWY1MGEwIn0.xPCJwpMTrID9uOgPGK8ntg'
-          attribution = '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> and Mapbox contributors'/>
-        ) : (
-          <TileLayer url = 'https://api.mapbox.com/styles/v1/mapbox/satellite-streets-v9/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1IjoiZm1lc3NpYXMiLCJhIjoiY2o4dnZ1ZHdhMWg5azMycDhncjdqMTg1eiJ9.Y75W4n6dTd9DOpctpizPrQ'
-          attribution = '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> and Mapbox contributors' />
-        )}
-
+        <TileLayer
+          url='https://api.mapbox.com/styles/v1/mapbox/streets-v10/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1IjoiY2ZyYW5jaXNjbyIsImEiOiJjajhrN3VlYmowYXNpMndzN2o2OWY1MGEwIn0.xPCJwpMTrID9uOgPGK8ntg'
+          attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> and Mapbox contributors'
+        />
         {parsedEntries.map((k) => (
           <Marker
            onContextMenu={(e) => { this._handleContextMenu(e, k.id); }}
@@ -203,8 +236,86 @@ class MapRender extends Component {
   render () {
     return (
       <AltContainer stores={{measures: MeasureStore, devices: DeviceStore}}>
-      <PositionRenderer points={this.props.devices}/>
+        <PositionRenderer points={this.props.devices}/>
       </AltContainer>
+    )
+  }
+}
+
+class DeviceList extends Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      isDisplayList: true,
+      filter: '',
+    };
+
+    this.handleViewChange = this.handleViewChange.bind(this);
+    this.applyFiltering = this.applyFiltering.bind(this);
+  }
+
+  handleViewChange(event) {
+    this.setState({isDisplayList: ! this.state.isDisplayList})
+  }
+
+  applyFiltering(deviceMap) {
+    // turns the stored device map into a list
+    let list = [];
+    for (let k in deviceMap) {
+      list.push(deviceMap[k]);
+    }
+
+    // TODO ordering should be defined by the user
+    list.sort((a,b) => {
+      if (a.updated > b.updated) {
+        return 1;
+      } else {
+        return -1;
+      }
+    })
+
+    return list;
+  }
+
+  render() {
+    const filteredList = this.applyFiltering(this.props.devices);
+    console.log('filteredList', filteredList);
+    const positionList = filteredList.map((x) => {
+      let positionAttr = x.static_attrs.filter(function(k){return k.type == "geo:point";});
+      if (positionAttr && positionAttr.length > 0) {
+          return {'id': x.id, 'geo': positionAttr[0].name, 'static': true};
+      } else {
+        positionAttr = x.attrs.filter(function(k){return k.type == "geo:point";});
+        if (positionAttr && positionAttr.length > 0) {
+          return {'id': x.id, 'geo': positionAttr[0].name, 'static': false};
+        }
+      }
+      return {'id':'-1'};
+    });
+    for (var index in positionList){
+        if (positionList[index].id == '-1')
+            delete positionList[index];
+    }
+    console.log('devices with geolocation: ',positionList);
+
+    return (
+      <div className = "flex-wrapper">
+        <div className="row z-depth-2 devicesSubHeader p0" id="inner-header">
+          <div className="col s4 m4 main-title"></div>
+          <div className= "col s2 m2 header-info hide-on-small-only">
+            <div className= "title"># Devices</div>
+            <div className= "subtitle">{filteredList.length}</div>
+          </div>
+          <Link to="/device/new" title="Create a new device" className="waves-effect waves-light btn-flat">
+            New Device
+          </Link>
+        </div>
+
+        <div className="deviceMapCanvas col m10 s12 offset-m1">
+          <MapRender devices={positionList} />
+        </div>
+      </div>
     )
   }
 }
@@ -217,6 +328,7 @@ class LayerBox extends Component {
   }
 
   toggleLayer() {
+    console.log("togglle ")
     this.setState({visible:!this.state.visible});
   }
 
@@ -226,8 +338,7 @@ class LayerBox extends Component {
         [-20.90974,-48.83651],
         [-21.80963,-47.11802]
     ]);
-
-    const layerOpacity = 0.3;
+    const layerOpacity = 0.7;
     const imageoverlay = this.state.visible ? (
       <ImageOverlay
         opacity={layerOpacity}
@@ -238,7 +349,7 @@ class LayerBox extends Component {
     return (
       <div className="col s12">
         <div className="layer-div" onClick={this.toggleLayer}>
-          <img src='images/layers.png' />
+          <img src='images/layers.ico' />
         </div>
         {imageoverlay}
       </div>
@@ -246,57 +357,37 @@ class LayerBox extends Component {
   }
 }
 
+
 class DeviceMap extends Component {
+
   constructor(props) {
     super(props);
 
-    this.checkingClick = this.checkingClick.bind(this);
+    this.filterChange = this.filterChange.bind(this);
   }
 
-  checkingClick(event) {
+  componentDidMount() {
+    DeviceActions.fetchDevices.defer();
+  }
+
+  filterChange(newFilter) {
   }
 
   render() {
-    // TODO refactor this away
-    let filteredList = []
-    if ((this.props.devices !== undefined) && (this.props.devices !== null)) {
-      for (let k in this.props.devices) {
-        if (this.props.devices.hasOwnProperty(k)){
-          filteredList.push(this.props.devices[k]);
-        }
-      }
-    }
-
-    let positionList = filteredList.map((x) => {
-      let positionAttr = x.attrs.find(function(k){return k.name == "lng";});
-      // @TODO We should also check the lat param;
-      if (positionAttr) {
-        return {'id': x.id, 'geo': "lng", 'static': false};
-      }
-      return undefined;
-    }).filter(function(k){return k != undefined;});
-
-
-    const device_icon  = (<img src='images/icons/chip.png' />)
-    const location_icon  = (<img src='images/icons/location.png' />)
-    const location_active_icon  = (<img src='images/icons/location_active.png' />)
-
+    const detail = ('detail' in this.props.location.query) ? this.props.location.query.detail : null;
     return (
-      <div className = "flex-wrapper">
-        <SubHeader>
-          <SubHeaderItem text={"Showing "+ filteredList.length + " devices "} icon={device_icon} active='false' clickable='false' />
-          <SubHeaderItem text="No tracking actived" icon={location_icon} active='false' clickable='false'  onClick='false'/>
-          <SubHeaderItem text="ID: XPTO" icon={location_active_icon} active='true' clickable='true'  onClick={this.checkingClick} />
-          {this.props.toggle}
-        </SubHeader>
-        <div className="deviceMapCanvas col m12 s12 relative">
-          <MapRender devices={positionList} />
-          <div className="col devicePainel full-height">
-            <SideBar devices={this.props.devices} />
-          </div>
-        </div>
-      </div>
-    )
+      <ReactCSSTransitionGroup
+        transitionName="first"
+        transitionAppear={true}
+        transitionAppearTimeout={500}
+        transitionEnterTimeout={500}
+        transitionLeaveTimeout={500} >
+        <PageHeader title="device manager" subtitle="Devices" shadow='true' />
+        <AltContainer store={DeviceStore}>
+          <DeviceList deviceid={detail}/>
+        </AltContainer>
+      </ReactCSSTransitionGroup>
+    );
   }
 }
 

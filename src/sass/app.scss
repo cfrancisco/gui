@@ -32,6 +32,7 @@ $porcelain: #ecf0f1;
 $silver: #b8b8b8;
 $dark-silver: #848484;
 $black: #2c3e50;
+$light-gray: #F6F7FB;
 $default: rgba(0, 0, 0, 0.87);
 // sidebar control variables
 $sidebar-width: 220px;
@@ -58,6 +59,9 @@ $details-background-color: #f3f3f3;
 // $main-font-family: Montserrat, sans-serif;
 $main-font-family: Roboto, sans-serif;
 
+.bg-light-gray {
+  background-color: $light-gray;
+}
 
 .full-width {
   position: relative;

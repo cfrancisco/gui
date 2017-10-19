@@ -171,6 +171,9 @@ $status: #0c343d;
       margin-right: 3%;
       height: 50px;
       width: 50px;
+      border-radius: 30px;
+      background: #fdfdfd;
+      overflow: hidden;
 
       > img {
         height: 50px;
@@ -194,7 +197,8 @@ $status: #0c343d;
 
     > .user-label {
       position: relative;
-      font-size: 120%;
+      font-size: 125%;
+      padding-left: 14px;
     }
 
     > .label {
@@ -205,7 +209,7 @@ $status: #0c343d;
     }
 
     > .badge {
-      color: $status;
+      color: $white;
       font-size: 80%;
       font-weight: bold;
       text-transform: uppercase;
@@ -222,9 +226,10 @@ $status: #0c343d;
     .metric {
       margin-top: 4%;
       border-right: $silver solid 1px;
-      text-align: center;
+      text-align: left;
 
       &.last {
+        text-align: right;
         border: none;
       }
 
@@ -786,6 +791,9 @@ $action-area-width: 200px;
 .deviceMapCanvas {
    height: 100%;
    width: 100%;
+   background-color: $light-gray;
+      padding-top:15px;
+      padding-bottom:15px;
 
    .leaflet-container {
      height: 100%;
