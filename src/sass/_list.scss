@@ -5,6 +5,13 @@ $disabled: $silver;
 $entry-default: $default-blue;
 $status: #0c343d;
 
+.div-btn-side-painel
+{
+  position: absolute;
+  right: 20px;
+  top: 20px;
+}
+
 .lst-icon {
   width:  2.1em;
   height: 2.1em;
@@ -38,6 +45,7 @@ $status: #0c343d;
 }
 
 .lst-wrapper {
+  background: $light-gray;
   padding: 0 6% !important;
 }
 
@@ -530,7 +538,8 @@ $status: #0c343d;
   color: #333;
   font-weight: bold;
   font-size: 100%;
-  padding: 0px 10px 0px 0px ;
+  // padding: 0px 10px 0px 0px ;
+  padding: 0 .75rem;
 }
 
 .lst-entry .data {
@@ -789,11 +798,10 @@ $action-area-width: 200px;
 }
 
 .deviceMapCanvas {
-   height: 100%;
+  height: calc(100% - 65px);
+  //  height: 100%;
    width: 100%;
    background-color: $light-gray;
-      padding-top:15px;
-      padding-bottom:15px;
 
    .leaflet-container {
      height: 100%;

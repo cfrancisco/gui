@@ -254,9 +254,7 @@ class DeviceMap extends Component {
         </SubHeader>
         <div className="deviceMapCanvas col m12 s12 relative">
           <PositionRenderer devices={filteredList} />
-          <div className="col devicePainel full-height">
-            <SideBar devices={this.props.devices} />
-          </div>
+          <SideBar devices={this.props.devices} />
         </div>
       </div>
     )
