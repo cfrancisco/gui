@@ -395,9 +395,15 @@ class Filter extends Component {
 class SideBar extends Component {
   constructor(props){
     super(props);
-    this.state = {click: null}
-
+    this.state = {click: null,
+      sideBarOpened: false}
+    this.toggleSideBar = this.toggleSideBar.bind(this);
     this.changeSideBar = this.changeSideBar.bind(this);
+  }
+  toggleSideBar() {
+    const last = this.state.sideBarOpened;
+    console.log("toggleSideBar ",last);
+    this.setState({sideBarOpened: !last});
   }
 
   changeSideBar(callback){
@@ -410,11 +416,26 @@ class SideBar extends Component {
   }
 
   render(){
-    if (this.state.click) {
-      return (<Filter devices={this.props.devices} callback={this.changeSideBar}/>);
-    } else {
-      return (<List devices={this.props.devices} callback={this.changeSideBar}/>);
-    }
+
+    const btnSideBar = this.state.sideBarOpened ? (
+      <button type="button" className='btn btn-circle sideBarToggle' onClick={this.state.toggleSideBar}>
+      <i className="fa fa-chevron-right" aria-hidden="true"></i>
+      </button> ) : (
+      <button type="button" className='btn btn-circle sideBarToggle' onClick={this.state.toggleSideBar}>
+        <i className="fa fa-chevron-left" aria-hidden="true"></i>
+      </button> )
+      const divFilterList =  this.state.click ? (<Filter devices={this.props.devices} callback={this.changeSideBar}/>)
+      : (<List devices={this.props.devices} callback={this.changeSideBar}/>);
+
+      return (
+      <div className="col">
+        {btnSideBar}
+        { this.state.sideBarOpened ?
+            (<div className="col devicePainel full-height">
+            {divFilterList}
+            </div>) : null }
+            </div>
+        )
   }
 }
 

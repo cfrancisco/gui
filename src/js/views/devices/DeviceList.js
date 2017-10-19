@@ -23,13 +23,12 @@ function SummaryItem(props) {
               <img src="images/ciShadow.svg" />
             </div>
             <div className="user-label truncate">{props.device.label}</div>
-            <div className="label">ID {props.device.id}</div>
             <span className={"badge " + status}>{props.device._status}</span>
           </div>
 
           <div className="lst-entry-body col s12">
             {/* TODO fill those with actual metrics */}
-            <div className="col s3 metric">
+            <div className="col s3 metric"s>
               <div className="metric-value">{attrs}</div>
               <div className="metric-label">Attributes</div>
             </div>
@@ -64,7 +63,7 @@ class DeviceList extends Component {
 
     if (filteredList.length > 0) {
       return (
-        <div className = "flex-wrapper">
+        <div className = "flex-wrapper bg-light-gray">
           {/* TODO refactor this to a different file */}
           <SubHeader>
             <SubHeaderItem text={"Showing "+ filteredList.length + " devices "}
@@ -78,10 +77,7 @@ class DeviceList extends Component {
                 { filteredList.map((device, idx) => <SummaryItem device={device} key={device.id}/>) }
               </div>
             </div>
-
-            <div className="col devicePainel full-height">
               <SideBar devices={this.props.devices} />
-            </div>
           </div>
         </div>
       )
