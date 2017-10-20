@@ -27,7 +27,7 @@ class ListItem extends Component {
     return (
       <div className="lst-entry-title col s12" id={this.props.device.id} title="See details">
         <div className="img col s3" id="img-chip">
-          <img src="images/chip.png" />
+          <img src="images/icons/chip.png" />
         </div>
         <div className="user-label truncate col s6">{name}</div>
         <div className="label col s6">RSSI {attrValue}</div>
@@ -164,7 +164,7 @@ class List extends Component {
 
     const showCanvas = 'deviceCanvas col s12 ' + hide;
     return (
-      <span className="list-of-devices">
+      <div className="list-of-devices">
         <div className="row device-list">
           <div className="col s12 main-title center-align">Devices</div>
           <div className="col s12 info-header">
@@ -187,7 +187,7 @@ class List extends Component {
             )}
           </div>
         </div>
-      </span>
+      </div>
     )
   }
 }
@@ -423,11 +423,9 @@ class SideBar extends Component {
   render(){
     function Footer(props) {
       return (
-        <div className="device-footer">
-          <div className="col s12 background-info" onClick={props.callback}>
+        <div className="device-footer col s12 background-info" onClick={props.callback}>
             <a className="waves-effect waves-light">{props.nextKey.toUpperCase()}</a>
           </div>
-        </div>
       )
     }
 
@@ -446,8 +444,10 @@ class SideBar extends Component {
           </button>
         </div>
         { this.state.sideBarOpened ? (
-          <div className="col devicePainel full-height">
-            {divFilterList}
+          <div className="col device-painel full-height">
+            <div className="col device-painel-body">
+              {divFilterList}
+            </div>
             <Footer callback={this.changeSideBar} nextKey={this.state.nextKey} />
           </div>
         ) : (

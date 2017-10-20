@@ -13,6 +13,7 @@ import DeviceActions from '../../actions/DeviceActions';
 import DeviceStore from '../../stores/DeviceStore';
 import deviceManager from '../../comms/devices/DeviceManager';
 import util from "../../comms/util/util";
+import {SubHeader, SubHeaderItem} from "../../components/SubHeader";
 
 import { Line } from 'react-chartjs-2';
 import { Map, Marker, Popup, TileLayer } from 'react-leaflet';
@@ -73,9 +74,6 @@ class DeviceUserActions extends Component {
         <a className="waves-effect waves-light btn-flat btn-ciano" tabIndex="-1" title="Get code">
           <i className="clickable fa fa-code"/>
         </a>
-        <Link to={"/device/list?detail=" + this.props.deviceid} className="waves-effect waves-light btn-flat btn-ciano" tabIndex="-1" title="Hide all details">
-          <i className="clickable fa fa-compress" />
-        </Link>
         <Link to={"/device/id/" + this.props.deviceid + "/edit"} className="waves-effect waves-light btn-flat btn-ciano" tabIndex="-1" title="Edit device">
           <i className="clickable fa fa-pencil" />
         </Link>
@@ -429,60 +427,72 @@ class DeviceDetail extends Component {
     }
 
     return (
-      <div className={"lst-entry-wrapper col s12 auto-height " + device._status}>
-        <div className="row detail-header">
-          <div className="title">
-            <div className="label">{device.label}</div>
-            <div className="id">ID {device.id}</div>
+      <div className={ "lst-entry-wrapper col s12 auto-height " + device._status}>
+          <div className="row s3 device">
+              <div className="row detail-box">
+                  <div className="row detail-box-header">
+                      General
+                  </div>
+                  <div className="col detail-box-body">
+                      <div className="metric">
+                          <span className="label">Attributes</span>
+                          <span className="value">{device.attrs.length + device.static_attrs.length}</span>
+                      </div>
+                      <div className="metric">
+                          <span className="label">Last update</span>
+                          <span className="value">{util.printTime(device.updated)}</span>
+                      </div>
+                      <div className="metric">
+                          <span className="label">Status</span>
+                          <span className="value">{device._status}</span>
+                      </div>
+                      <div className="metric">
+                          <span className="label">Protocol</span>
+                          <span className="value">{device.protocol ? device.protocol : "MQTT"}</span>
+                      </div>
+                  </div>
+              </div>
+              <div className="row attribute-box">
+                  <div className="row attribute-header">All Attributes
+                  </div>
+                  <span className="highlight"> Showing 12 of 32 attributes
+                  </span>
+                  <div className="col s12">
+                      <div className="input-field col s5">
+                          <MaterialSelect id="attributes-select" name="attribute" value={this.state.attribute} onChange={this.handleChangeAttribute}>
+                              <option value="Name">Name</option>
+                              <option value="ID">ID</option>
+                              <option value="Protocol">Protocol</option>
+                              <option value="Tags">Tags</option>
+                              <option value="Status">Status</option>
+                          </MaterialSelect>
+                      </div>
+                      <div className="col s12 actions-buttons">
+                          <div className="col s6 button">
+                              <a className="waves-effect waves-light btn" id="btn-clear" tabIndex="-1" title="Clear" onClick={this.clearSearch}>
+                            Clear
+                          </a>
+                          </div>
+                          <div className="col s6 button" type="submit">
+                              <a className="waves-effect waves-light btn" id="btn-search" tabIndex="-1" title="Search">
+                                <i className="clickable fa fa-search"/>
+                              </a>
+                          </div>
+                      </div>
+                      <div className="col s12">
+                          box aqui
+                      </div>
+                      <AltContainer store={MeasureStore} inject={{device: device}}>
+                          <DetailAttrs />
+                      </AltContainer>
+                  </div>
+              </div>
+              <div className="row s9 device-map">
+                  Mapa aqui
+              </div>
           </div>
         </div>
-        <div className="row device">
-          <div className="row detail-header">
-            <div className="col s12 m10 offset-m1 valign-wrapper">
-              <div className="col s3">
-                {/* TODO clickable, file upload */}
-                <div className="img">
-                  <img src="images/ciShadow.svg" />
-                </div>
-              </div>
-              <div className="col s9 detail-body-full-view">
-                <div className="metrics col s9">
-                  <div className="metric fullPage col s4">
-                    <span className="label">Attributes</span>
-                    <span className="value">{device.attrs.length + device.static_attrs.length}</span>
-                  </div>
-                  <div className="metric fullPage col s4">
-                    <span className="label">Last update</span>
-                    <span className="value">{util.printTime(device.updated)}</span>
-                  </div>
-                  <div className="metric fullPage ol s4">
-                    <span className="label">Status</span>
-                    <span className="value">{device._status}</span>
-                  </div>
-                </div>
-
-                <div className="metrics col s9">
-                  <div className="metric fullPage col s4" >
-                    <span className="label">Protocol</span>
-                    <span className="value">{device.protocol ? device.protocol : "MQTT"}</span>
-                  </div>
-                  <div className="metric fullPage col s8" >
-                    <span className="label">Tags</span>
-                    <TagList tags={device.tags} />
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className="col s12 detail-attributes-full-view" >
-            <div className="title col s12 paddingTop10">Attributes</div>
-            <AltContainer store={MeasureStore} inject={{device: device}} >
-              <DetailAttrs />
-            </AltContainer>
-          </div>
-        </div>
-      </div>
-    )
+      )
   }
 }
 
@@ -516,16 +526,20 @@ class ViewDevice extends Component {
   render() {
     let title = "View device";
 
+    const online_icon = (<i className="fa fa-info-circle clr-green" >Online</i>);
+    const offline_icon = (<i className="fa fa-info-circle clr-red" >Offline</i>);
+
     return (
       <div className="full-width full-height">
         <ReactCSSTransitionGroup
           transitionName="first"
           transitionAppear={true} transitionAppearTimeout={500}
           transitionEnterTimeout={500} transitionLeaveTimeout={500} >
-          <PageHeader title="device manager" subtitle="Devices" />
-          <ActionHeader title={title}>
+          <SubHeader>
+            <SubHeaderItem text={"Viewing Device: "+ this.props.params.device.name } />
+            <SubHeaderItem text="" icon={online_icon} />
             <DeviceUserActions deviceid={this.props.params.device} confirmTarget="confirmDiag"/>
-          </ActionHeader>
+          </SubHeader>
           <AltContainer store={DeviceStore} >
             <DeviceDetail deviceid={this.props.params.device}/>
           </AltContainer>

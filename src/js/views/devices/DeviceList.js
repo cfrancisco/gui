@@ -73,7 +73,7 @@ class DeviceList extends Component {
 
           <div className="deviceMapCanvas col m12 s12 relative">
             <div className="row">
-              <div className="col s12  lst-wrapper">
+              <div className="col s12  lst-wrapper extra-padding">
                 { filteredList.map((device, idx) => <SummaryItem device={device} key={device.id}/>) }
               </div>
             </div>

@@ -1,3 +1,46 @@
+.detail-box
+{
+  background: #FAFAFA;
+  box-shadow: 4px 0px 6px rgba(0, 0, 0, 0.25);
+
+  .detail-box-header
+  {
+    font-family: 'Open Sans', 'Roboto';
+    font-size: 14px;
+    letter-spacing: 0.42px;
+    text-indent: 293px;
+    text-transform: uppercase;
+    color: #2D9CDB;
+    border:2px solid #2D9CDB;
+  }
+
+  .detail-box-body
+  {
+
+  }
+
+  .metric
+  {
+    text-transform: uppercase;
+
+    .label{
+      font-family: 'Open Sans', 'Roboto';
+      font-size: 14px;
+      letter-spacing: 0.42px;
+      color: #4F4F4F;
+    }
+
+    .value
+    {
+      font-family: 'Open Sans', 'Roboto';
+      font-weight: bold;
+      font-size: 13px;
+      letter-spacing: 0.39px;
+    }
+  }
+}
+
+
 .toggle-icon
 {
   width: 17px;
@@ -83,16 +126,27 @@
   left: 100%;
 }
 
-.devicePainel
+.extra-padding
+{
+    padding: 20px 38px !important;
+}
+
+.device-painel
 {
   position: absolute;
-  z-index: 1010;
-  background: white;
+  z-index: 994;
+  // z-index: 1010;
+  background: rgba(255, 255, 255, 0.97);
   right: 0;
   display: inline-block;
   top: 0;
   width: 400px;
-  height: calc(100% - 0px);
+  height: auto;
+}
+
+.device-painel-body
+{
+    height: calc(100% - 35px);
 }
 
 .list-of-devices{
@@ -158,13 +212,30 @@
   }
   .deviceCanvas{
     width: 100% !important;
-    overflow-y: auto;
-    height: calc(100% - 106px);
+    // overflow-y: auto;
+    height: 100%;
+    overflow-y: scroll;
+    // height: calc(100% - 106px);
+
     .row{
       margin:0;
       .lst-entry-title{
+        padding: 4px 10px;
+        height: 60px;
         position: relative;
-        padding: 5px 10px;
+        transition: linear 100ms;
+        border-bottom: 1px solid #e2e2e2;
+
+        .img
+        {
+          width: 58px;
+          padding: 10px;
+
+          img
+          {
+              width: 100%;
+          }
+        }
         .waves-effect{
           overflow: visible !important;
           width: 90%;
@@ -176,6 +247,8 @@
           transition: linear 100ms;
         }
         .user-label{
+          text-transform: uppercase;
+          padding-top: 6px;
           font-family: 'Open Sans', sans-serif;
           color: #161616;
           font-weight: normal;
@@ -202,14 +275,14 @@
 }
 
 .device-footer{
-  float: left;
+  bottom: 0px;
   width: 100%;
-  .background-info{
-    position: absolute;
-    float: left;
-    width: 100%;
-    cursor: pointer;
-    background-color: #FAFAFA;
+  position: absolute;
+  cursor: pointer;
+  background-color: #FAFAFA;
+  height: 35px;
+  text-align: center;
+  vertical-align: middle;
     //border-left: #BDBDBD solid 1px;
     a{
       font-family: 'Open Sans', sans-serif;
@@ -217,7 +290,6 @@
       font-weight: bold;
       font-size: 0.8em;
     }
-  }
 }
 
 .device-filtering{
@@ -623,9 +695,9 @@ h1, h2, p {
   width: 100%;
   height: 65px;
   display: inline-block;
-  animation-name: height-opacity-0-to-100;
-  animation-duration: 1.5s;
-  animation-iteration-count: 1;
+  // animation-name: height-opacity-0-to-100;
+  // animation-duration: 1.5s;
+  // animation-iteration-count: 1;
 
 
   .main-title{

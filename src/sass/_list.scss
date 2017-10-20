@@ -1,3 +1,5 @@
+
+
 // #16a085ff
 $online: #16a085;
 $offline: #f85252;
@@ -8,10 +10,10 @@ $status: #0c343d;
 .div-btn-side-painel
 {
   position: absolute;
-  right: 20px;
+  right: 0px;
   top: 20px;
   z-index: 10110;
-  transition: all 1s;
+  // transition: all 1s;
 
   &.push-left
   {
