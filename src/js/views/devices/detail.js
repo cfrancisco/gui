@@ -413,7 +413,7 @@ class AttributeBox extends Component {
     // if (this.props.deviceid == null || !this.props.devices.hasOwnProperty(this.props.deviceid)) {
     //   console.error('Failed to load device attribute data', this.props.deviceid, this.props.devices);
       return (
-        <div className="row col s12 detail-box">
+        <div className="row col s12 ">
             <div className="col s6 card-box">
                 <div className="detail-box-header">
                     Attributes
@@ -447,7 +447,7 @@ class AttributeBox extends Component {
                   </a>
                 </div>
             </div>
-            <div className="col s6 detail-box graph-box">
+            <div className="col s6 graph-box">
               <div className='col s12 legend'>
                 Showing 1 Hour From 10:23 to 11:23 10/13/2017
               </div>
@@ -539,7 +539,7 @@ class DeviceDetail extends Component {
                       <div className="input-field col s5">
                       {
                       //  <MaterialSelect id="attributes-select" name="attribute" value={this.state.selected_attribute}
-                      //                 onChange={this.handleSelectedAttribute}>
+                      //       onChange={this.handleSelectedAttribute}>
                       //   <option value="Temperature">Temperature</option>
                       //   <option value="RPM">RPM</option>
                       //   <option value="Track">Track</option>
@@ -549,7 +549,7 @@ class DeviceDetail extends Component {
                     }
                       </div>
                       <div className="col s12 actions-buttons">
-                          <div className="col s6 button">
+                          <div className="col s6 button ta-center">
                               <a className="waves-effect waves-light btn btn-light" id="btn-clear" tabIndex="-1" title="Clear" onClick={this.clearList}>
                             Clear
                           </a>

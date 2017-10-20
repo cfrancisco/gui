@@ -1,3 +1,8 @@
+.ta-center
+{
+    text-align: center;
+}
+
 .p16
 {
   padding: 16px;
@@ -15,14 +20,14 @@
 
 .device-map
 {
+
     margin-top: -10px;
     position: absolute;
-    right: 0px;
+    right: 0px !important;
     width: 75%;
     z-index: 10;
     padding: 0px !important;
 }
-
 .device-map-box
 {
     height: 400px;
@@ -37,6 +42,7 @@
 
 .graph-box
 {
+  box-shadow: 4px 0px 6px rgba(0, 0, 0, 0.25);
   background: #EDEDED;
   height: 350px;
 
@@ -53,8 +59,11 @@
 
 .card-box
 {
+  background: #FAFAFA;
+  box-shadow: 4px 0px 6px rgba(0, 0, 0, 0.25);
   height: 350px;
   padding: 0px;
+  overflow: auto;
 
   .attr-line
   {
