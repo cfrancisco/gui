@@ -1,3 +1,5 @@
+
+
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 
@@ -16,7 +18,9 @@ import util from "../../comms/util/util";
 import {SubHeader, SubHeaderItem} from "../../components/SubHeader";
 
 import { Line } from 'react-chartjs-2';
-import { Map, Marker, Popup, TileLayer } from 'react-leaflet';
+import { Map, Marker, Popup, TileLayer, Tooltip } from 'react-leaflet';
+import MaterialSelect from "../../components/MaterialSelect";
+import { divIcon } from 'leaflet';
 
 // TODO make this its own component
 class RemoveDialog extends Component {
@@ -393,7 +397,83 @@ function TagList (props) {
   )
 }
 
+
+class AttributeBox extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {selected: null};
+    this.changeAttribute = this.changeAttribute.bind(this);
+  }
+
+  changeAttribute(attr_id) {
+    console.log("changeAttribute ",attr_id);
+  }
+
+  render() {
+    // if (this.props.deviceid == null || !this.props.devices.hasOwnProperty(this.props.deviceid)) {
+    //   console.error('Failed to load device attribute data', this.props.deviceid, this.props.devices);
+      return (
+        <div className="row col s12 detail-box">
+            <div className="col s6 card-box">
+                <div className="detail-box-header">
+                    Attributes
+                </div>
+
+                <div className="col s12 p0 attr-line">
+                  <a className="waves-effect waves-light" onClick={this.clearList}>
+                  <span className="attr-name">Coordinates</span>
+                  <span>Last received value: </span>
+                  </a>
+                </div>
+
+                <div className="col s12 p0 attr-line">
+                  <a className="waves-effect waves-light" onClick={this.clearList}>
+                  <span className="attr-name">RPM</span>
+                  <span>Last received value: </span>
+                  </a>
+                </div>
+
+                <div className="col s12 p0 attr-line">
+                  <a className="waves-effect waves-light" onClick={this.clearList}>
+                  <span className="attr-name">Temperature</span>
+                  <span>Last received value: </span>
+                  </a>
+                </div>
+
+                <div className="col s12 p0 attr-line">
+                  <a className="waves-effect waves-light" onClick={this.clearList}>
+                  <span className="attr-name">Track</span>
+                  <span>Last received value: </span>
+                  </a>
+                </div>
+            </div>
+            <div className="col s6 detail-box graph-box">
+              <div className='col s12 legend'>
+                Showing 1 Hour From 10:23 to 11:23 10/13/2017
+              </div>
+              {
+                // <DetailAttrs />
+              }
+            </div>
+        </div>
+      )
+    }
+  }
+
+
 class DeviceDetail extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {selected_attribute: ''};
+    this.handleSelectedAttribute = this.handleSelectedAttribute.bind(this);
+
+  }
+
+  handleSelectedAttribute() {
+    console.log("handleSelectedAttribute ");
+  }
+
+
   render() {
     if (this.props.deviceid == null || !this.props.devices.hasOwnProperty(this.props.deviceid)) {
       console.error('Failed to load device attribute data', this.props.deviceid, this.props.devices);
@@ -427,13 +507,12 @@ class DeviceDetail extends Component {
     }
 
     return (
-      <div className={ "lst-entry-wrapper col s12 auto-height " + device._status}>
-          <div className="row s3 device">
-              <div className="row detail-box">
-                  <div className="row detail-box-header">
+      <div className={ "row col s12 auto-height "}>
+          <div className="col s3 detail-box">
+                  <div className="detail-box-header">
                       General
                   </div>
-                  <div className="col detail-box-body">
+                <div className="detail-box-body">
                       <div className="metric">
                           <span className="label">Attributes</span>
                           <span className="value">{device.attrs.length + device.static_attrs.length}</span>
@@ -451,51 +530,88 @@ class DeviceDetail extends Component {
                           <span className="value">{device.protocol ? device.protocol : "MQTT"}</span>
                       </div>
                   </div>
-              </div>
               <div className="row attribute-box">
                   <div className="row attribute-header">All Attributes
                   </div>
-                  <span className="highlight"> Showing 12 of 32 attributes
+                  <span className="highlight"> Showing <b>12</b> of <b>32</b> attributes
                   </span>
-                  <div className="col s12">
+                  <div className="col s12 p16">
                       <div className="input-field col s5">
-                          <MaterialSelect id="attributes-select" name="attribute" value={this.state.attribute} onChange={this.handleChangeAttribute}>
-                              <option value="Name">Name</option>
-                              <option value="ID">ID</option>
-                              <option value="Protocol">Protocol</option>
-                              <option value="Tags">Tags</option>
-                              <option value="Status">Status</option>
-                          </MaterialSelect>
+                      {
+                      //  <MaterialSelect id="attributes-select" name="attribute" value={this.state.selected_attribute}
+                      //                 onChange={this.handleSelectedAttribute}>
+                      //   <option value="Temperature">Temperature</option>
+                      //   <option value="RPM">RPM</option>
+                      //   <option value="Track">Track</option>
+                      //   <option value="Speed">Speed</option>
+                      //   <option value="Coordinates">Coordinates</option>
+                      // </MaterialSelect>
+                    }
                       </div>
                       <div className="col s12 actions-buttons">
                           <div className="col s6 button">
-                              <a className="waves-effect waves-light btn" id="btn-clear" tabIndex="-1" title="Clear" onClick={this.clearSearch}>
+                              <a className="waves-effect waves-light btn btn-light" id="btn-clear" tabIndex="-1" title="Clear" onClick={this.clearList}>
                             Clear
                           </a>
                           </div>
                           <div className="col s6 button" type="submit">
-                              <a className="waves-effect waves-light btn" id="btn-search" tabIndex="-1" title="Search">
-                                <i className="clickable fa fa-search"/>
+                              <a className="waves-effect waves-light btn" id="btn-add" tabIndex="-1" title="Add">
+                                <i className="clickable fa fa-plus"/>
                               </a>
                           </div>
                       </div>
-                      <div className="col s12">
-                          box aqui
+                      <div className="box-list">
                       </div>
-                      <AltContainer store={MeasureStore} inject={{device: device}}>
-                          <DetailAttrs />
-                      </AltContainer>
                   </div>
               </div>
-              <div className="row s9 device-map">
-                  Mapa aqui
-              </div>
-          </div>
+            </div>
+            <div className="row col s9 device-map">
+                    <div className="col s12 device-map-box">
+                        <MapLocation />
+                    </div>
+                    <div className="col s12 p0">
+                    <AltContainer store={MeasureStore} inject={{device: device}}>
+                        <AttributeBox />
+                    </AltContainer>
+                    </div>
+            </div>
         </div>
       )
   }
 }
 
+class MapLocation extends Component {
+  constructor(props) {
+    super(props);
+    // this.remove = this.remove.bind(this);
+  }
+
+  render() {
+    let title = "View device";
+    var darkBluePin = L.divIcon({className: 'icon-marker bg-dark-blue'});
+    const mkr = {id:'id', pos:[21,22], pin:darkBluePin, name: 'k.label'};
+    const position = [21,22];
+
+    return (
+      <div className="map full-height">
+        <Map center={position} zoom={19}>
+          <TileLayer
+            url='http://{s}.tile.osm.org/{z}/{x}/{y}.png'
+            attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+          />
+          <Marker
+           position={mkr.pos} key={mkr.id} icon={mkr.pin}  >
+          <Tooltip>
+            <span>
+             {mkr.id }: {mkr.name}
+            </span>
+          </Tooltip>
+          </Marker>
+        </Map>
+      </div>
+    )
+  }
+}
 class ViewDevice extends Component {
   constructor(props) {
     super(props);
@@ -526,8 +642,8 @@ class ViewDevice extends Component {
   render() {
     let title = "View device";
 
-    const online_icon = (<i className="fa fa-info-circle clr-green" >Online</i>);
-    const offline_icon = (<i className="fa fa-info-circle clr-red" >Offline</i>);
+    const online_icon = (<span className='status-on-off clr-green'><i className="fa fa-info-circle" />Online</span>);
+    const offline_icon = (<span className='status-on-off clr-red'><i className="fa fa-info-circle" />Offline</span>);
 
     return (
       <div className="full-width full-height">
@@ -535,13 +651,17 @@ class ViewDevice extends Component {
           transitionName="first"
           transitionAppear={true} transitionAppearTimeout={500}
           transitionEnterTimeout={500} transitionLeaveTimeout={500} >
-          <SubHeader>
-            <SubHeaderItem text={"Viewing Device: "+ this.props.params.device.name } />
-            <SubHeaderItem text="" icon={online_icon} />
-            <DeviceUserActions deviceid={this.props.params.device} confirmTarget="confirmDiag"/>
-          </SubHeader>
           <AltContainer store={DeviceStore} >
-            <DeviceDetail deviceid={this.props.params.device}/>
+          <SubHeader>
+            <SubHeaderItem text={"Viewing Device: "+ this.props.params.device.label } />
+            <div className="box-sh">
+              <DeviceUserActions deviceid={this.props.params.device} confirmTarget="confirmDiag"/>
+            </div>
+            <div className="box-sh">
+              {online_icon}
+            </div>
+          </SubHeader>
+          <DeviceDetail deviceid={this.props.params.device}/>
           </AltContainer>
           <RemoveDialog callback={this.remove} target="confirmDiag" />
         </ReactCSSTransitionGroup>

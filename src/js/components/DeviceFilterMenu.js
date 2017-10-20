@@ -27,7 +27,7 @@ class ListItem extends Component {
     return (
       <div className="lst-entry-title col s12" id={this.props.device.id} title="See details">
         <div className="img col s3" id="img-chip">
-          <img src="images/icons/chip.png" />
+          <img src="images/chip.png" />
         </div>
         <div className="user-label truncate col s6">{name}</div>
         <div className="label col s6">RSSI {attrValue}</div>
