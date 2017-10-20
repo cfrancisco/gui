@@ -12,9 +12,9 @@
 {
   color: black;
   background: none;
+  font-size: 12px;
   border: 0px;
   box-shadow: none;
-  padding-left: 0px;
 }
 
 
@@ -48,12 +48,14 @@
 
   .legend
   {
+    padding: 10px;
     font-family: "Open Sans";
     font-weight: bold;
-    font-size: 14px;
+    font-size: 12px;
     text-align: center;
-    letter-spacing: 0.42px;
+    letter-spacing: 0.82px;
     color: #4F4F4F;
+    text-transform: uppercase;
   }
 }
 
@@ -62,7 +64,7 @@
   background: #FAFAFA;
   box-shadow: 4px 0px 6px rgba(0, 0, 0, 0.25);
   height: 350px;
-  padding: 0px;
+  padding: 0px !important;
   overflow: auto;
 
   .attr-line
@@ -87,7 +89,7 @@
       display: block;
       font-family: 'Roboto';
       font-weight: bold;
-      font-size: 20px;
+      font-size: 17px;
       letter-spacing: 0.66px;
       text-transform: uppercase;
       color: #4F4F4F;
@@ -106,7 +108,7 @@
 
 .attribute-box
 {
-  padding-top: 100px;
+  padding-top: 44px;
   padding-left: 21px;
 
   .attribute-header{
@@ -142,8 +144,22 @@
   }
 }
 
+.detail-box-header {
+    font-family: 'Open Sans', 'Roboto';
+    font-size: 12px;
+    letter-spacing: 0.42px;
+    font-weight: 400;
+    text-transform: uppercase;
+    color: #2D9CDB;
+    padding: 6px 22px;
+    border-bottom: 2px solid #2D9CDB;
+    text-align: right;
+}
+
+
 .detail-box
 {
+  height:750px;
   background: #FAFAFA;
   box-shadow: 4px 0px 6px rgba(0, 0, 0, 0.25);
   margin-top: -10px;
@@ -152,17 +168,6 @@
   z-index: 120;
   position: absolute;
 
-  .detail-box-header {
-      font-family: 'Open Sans', 'Roboto';
-      font-size: 12px;
-      letter-spacing: 0.42px;
-      font-weight: 400;
-      text-transform: uppercase;
-      color: #2D9CDB;
-      padding: 6px 22px;
-      border-bottom: 2px solid #2D9CDB;
-      text-align: right;
-  }
 
   .detail-box-body
   {
