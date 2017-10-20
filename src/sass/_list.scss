@@ -10,6 +10,13 @@ $status: #0c343d;
   position: absolute;
   right: 20px;
   top: 20px;
+  z-index: 10110;
+  transition: all 1s;
+
+  &.push-left
+  {
+    right: 386px;
+  }
 }
 
 .lst-icon {
@@ -696,9 +703,10 @@ $status: #0c343d;
 
 .background-info {
   color: $subtle;
-  font-size: 200%;
+  font-size: 15px;
   font-family: 'Cuprum', sans-serif;
   text-align: center;
+  padding: 5px;
 
   i.material-icons {
     font-size: 5em;
@@ -798,8 +806,8 @@ $action-area-width: 200px;
 }
 
 .deviceMapCanvas {
-  height: calc(100% - 65px);
-  //  height: 100%;
+  // height: calc(100% - 65px);
+   height: 100%;
    width: 100%;
    background-color: $light-gray;
 
