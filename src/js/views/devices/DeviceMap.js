@@ -44,6 +44,9 @@ class PositionRenderer extends Component {
 
   _handleTracking(device_id) {
     this.props.toggleTracking(device_id)
+
+    // closing ctxMenu
+    this.setState({ visible: true });
   }
 
   // context menu based at
@@ -238,7 +241,7 @@ class LayerBox extends Component {
         [-21.80963,-47.11802]
     ]);
 
-    const layerOpacity = 0.3;
+    const layerOpacity = 0.4;
     const imageoverlay = this.state.visible ? (
       <ImageOverlay
         opacity={layerOpacity}
@@ -337,7 +340,7 @@ class DeviceMap extends Component {
           <SubHeaderItem text={trackingText} icon={location_icon} active='false' clickable='false'  onClick='false'/>
           {this.props.toggle}
         </SubHeader>
-        <div className="deviceMapCanvas col m12 s12 relative">
+        <div className="deviceMapCanvas deviceMapCanvas-map col m12 s12 relative">
           <PositionRenderer devices={pointList} toggleTracking={this.toggleTracking}/>
           <SideBar devices={deviceList} statusMap={this.state.hide} toggleDisplay={this.toggleDisplay}/>
         </div>

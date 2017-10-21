@@ -415,6 +415,14 @@ class DeviceDetail extends Component {
 
   render() {
     const device = this.props.devices[this.props.deviceid];
+    if (device.position !== undefined)
+    {
+      var location = "Lat: "+device.position[0]+" Lng: "+device.position[1];
+    }
+    else{
+      var location = "";
+    }
+
     return (
       <div className="row detail-body">
         <div className="col s3 detail-box full-height">
@@ -429,8 +437,8 @@ class DeviceDetail extends Component {
                 <span className="value">{util.printTime(device.updated)}</span>
             </div>
             <div className="metric">
-                <span className="label">Status</span>
-                <span className="value">{device._status}</span>
+                <span className="label">Location</span>
+                <span className="value">{location}</span>
             </div>
             <div className="metric">
                 <span className="label">Protocol</span>
@@ -515,7 +523,9 @@ class ViewDeviceImpl extends Component {
     return (
       <div className="full-height">
         <SubHeader>
-          <SubHeaderItem text={"Viewing Device: "+ device.label } />
+          <div className="box-sh box-sh-2">
+            <label> Viewing Device </label> <div className="device_name">{device.label}</div>
+          </div>
           <div className="box-sh">
             <DeviceUserActions deviceid={device.id} confirmTarget="confirmDiag"/>
           </div>
