@@ -11,7 +11,7 @@ function Loading(props) {
 // TODO: take contents as children
 function BackgroundMessage(props) {
   return (
-    <div className="full-height valign-wrapper background-info subtle relative graph">
+    <div className="full-height valign-wrapper background-info subtle relative graph report-problem">
       <div className="horizontal-center">
         <i className="material-icons">report_problem</i>
         <div>No position data available</div>
