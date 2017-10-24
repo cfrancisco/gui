@@ -47,7 +47,7 @@ class PositionRenderer extends Component {
     this.props.toggleTracking(device_id)
 
     // closing ctxMenu
-    this.setState({ visible: true });
+    this.setState({ visible: false });
   }
 
   // context menu based at
