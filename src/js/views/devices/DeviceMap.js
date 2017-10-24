@@ -244,8 +244,8 @@ class LayerBox extends Component {
     this.toggleLayer = this.toggleLayer.bind(this);
   }
 
-  toggleLayer(e) {
-    e.preventDefault();
+  toggleLayer: function (event) {
+    console.log("event",event);
     this.setState({visible:!this.state.visible});
   }
 
