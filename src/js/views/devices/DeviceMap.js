@@ -244,8 +244,9 @@ class LayerBox extends Component {
     this.toggleLayer = this.toggleLayer.bind(this);
   }
 
-  toggleLayer(e) {
-    e.preventDefault();
+  toggleLayer(event) {
+    event.preventDefault()
+    console.log("event",event);
     this.setState({visible:!this.state.visible});
   }
 
@@ -265,7 +266,7 @@ class LayerBox extends Component {
 
     return (
       <div className="col s12">
-        <div className=" layer-div" onClick={this.toggleLayer}>
+        <div className=" layer-div" onClick={(e) => this.toggleLayer(e)}>
           <img src='images/layers.png' />
         </div>
         {imageoverlay}
