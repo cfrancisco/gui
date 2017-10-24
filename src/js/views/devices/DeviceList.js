@@ -124,8 +124,12 @@ class DeviceList extends Component {
       )
     } else {
       return  (
-        <div className="background-info valign-wrapper full-height">
+        <div className="background-info valign-wrapper full-height relative">
           <span className="horizontal-center">No configured devices</span>
+          <SideBar devices={this.props.devices}
+                   setDisplayMap={this.setDisplayMap}
+                   toggleDisplay={this.toggleDisplay}
+                   statusMap={this.state.displayMap}/>
         </div>
       )
     }
