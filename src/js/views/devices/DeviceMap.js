@@ -54,6 +54,9 @@ class PositionRenderer extends Component {
   // https://codepen.io/devhamsters/pen/yMProm
 
   _handleClick(e) {
+      if (!this.props.allowContextMenu){
+        return false;
+      }
       const visible = this.state.visible;
       event = e.originalEvent;
       const wasOutside = !(event.target.contains === this.root);
@@ -66,6 +69,9 @@ class PositionRenderer extends Component {
   };
 
   _handleContextMenu(e, device_id) {
+    if (!this.props.allowContextMenu){
+      return false;
+    }
     event = e.originalEvent;
     event.preventDefault();
     this.setState({ visible: true , selected_device_id: device_id});
@@ -412,7 +418,7 @@ class DeviceMap extends Component {
           {this.props.toggle}
         </SubHeader>
         <div className="deviceMapCanvas deviceMapCanvas-map col m12 s12 relative">
-          <PositionRenderer devices={pointList} toggleTracking={this.toggleTracking} opacity={this.state.opacity}/>
+          <PositionRenderer devices={pointList} toggleTracking={this.toggleTracking} opacity={this.state.opacity} allowContextMenu={true}/>
           <SideBar devices={this.props.devices} statusMap={this.state.displayMap}
                    toggleDisplay={this.toggleDisplay} setDisplayMap={this.setDisplayMap} />
         </div>

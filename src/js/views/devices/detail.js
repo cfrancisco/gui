@@ -408,7 +408,7 @@ class DeviceDetail extends Component {
         </div>
         <div className="col s9 device-map full-height">
           <div className="col s12 device-map-box">
-            <PositionRenderer devices={[device]}/>
+            <PositionRenderer devices={[device]} allowContextMenu={false}/>
           </div>
           <div className="col s12 p0 data-box full-height">
             <AltContainer store={MeasureStore} inject={{device: device}}>
