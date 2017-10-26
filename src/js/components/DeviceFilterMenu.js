@@ -104,11 +104,11 @@ class List extends Component {
   }
 
   hideDevices(event) {
-    // TODO this is wrong - do over
+    this.props.hideAll();
   }
 
   showDevices(event) {
-    // TODO this is wrong - do over
+    this.props.showAll();
   }
 
   render(){
@@ -328,6 +328,8 @@ class SideBar extends Component {
       <Filter devices={this.props.devices} setDisplayMap={this.props.setDisplayMap}/>
     ) : (
       <List devices={this.props.devices}
+            hideAll={this.props.hideAll}
+            showAll={this.props.showAll}
             toggleDisplay={this.props.toggleDisplay}
             displayMap={this.props.statusMap} />
     );

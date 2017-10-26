@@ -50,6 +50,8 @@ class DeviceList extends Component {
 
     this.shouldShow = this.shouldShow.bind(this);
     this.toggleDisplay = this.toggleDisplay.bind(this);
+    this.hideAll = this.hideAll.bind(this);
+    this.showAll = this.showAll.bind(this);
     this.setDisplay = this.setDisplay.bind(this);
     this.setDisplayMap = this.setDisplayMap.bind(this);
   }
@@ -61,6 +63,26 @@ class DeviceList extends Component {
     }
 
     return true;
+  }
+
+  showAll()
+  {
+    let displayMap = this.state.displayMap;
+    for (let k in this.props.devices){
+      let device = this.props.devices[k];
+      displayMap[device.id] = true;
+    }
+    this.setState({displayMap: displayMap});
+  }
+
+  hideAll()
+  {
+    let displayMap = this.state.displayMap;
+    for (let k in this.props.devices){
+      let device = this.props.devices[k];
+      displayMap[device.id] = false;
+    }
+    this.setState({displayMap: displayMap});
   }
 
   toggleDisplay(device){
@@ -117,6 +139,8 @@ class DeviceList extends Component {
             </div>
               <SideBar devices={this.props.devices}
                        setDisplayMap={this.setDisplayMap}
+                       hideAll={this.hideAll}
+                       showAll={this.showAll}
                        toggleDisplay={this.toggleDisplay}
                        statusMap={this.state.displayMap}/>
           </div>
@@ -128,6 +152,8 @@ class DeviceList extends Component {
           <span className="horizontal-center">No configured devices</span>
           <SideBar devices={this.props.devices}
                    setDisplayMap={this.setDisplayMap}
+                   hideAll={this.hideAll}
+                   showAll={this.showAll}
                    toggleDisplay={this.toggleDisplay}
                    statusMap={this.state.displayMap}/>
         </div>

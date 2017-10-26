@@ -350,7 +350,8 @@ class DeviceMap extends Component {
     };
 
     this.toggleTracking = this.toggleTracking.bind(this);
-
+    this.hideAll = this.hideAll.bind(this);
+    this.showAll = this.showAll.bind(this);
     this.toggleDisplay = this.toggleDisplay.bind(this);
     this.setDisplay = this.setDisplay.bind(this);
     this.setDisplayMap = this.setDisplayMap.bind(this);
@@ -367,6 +368,26 @@ class DeviceMap extends Component {
     }
 
     return true;
+  }
+
+  showAll()
+  {
+    let displayMap = this.state.displayMap;
+    for (let k in this.props.devices){
+      let device = this.props.devices[k];
+      displayMap[device.id] = true;
+    }
+    this.setState({displayMap: displayMap});
+  }
+
+  hideAll()
+  {
+    let displayMap = this.state.displayMap;
+    for (let k in this.props.devices){
+      let device = this.props.devices[k];
+      displayMap[device.id] = false;
+    }
+    this.setState({displayMap: displayMap});
   }
 
   toggleDisplay(device){
@@ -466,7 +487,7 @@ class DeviceMap extends Component {
         <div className="deviceMapCanvas deviceMapCanvas-map col m12 s12 relative">
           <PositionRenderer devices={pointList} toggleTracking={this.toggleTracking} opacity={this.state.opacity} allowContextMenu={true}/>
           <SideBar devices={this.props.devices} statusMap={this.state.displayMap}
-                   toggleDisplay={this.toggleDisplay} setDisplayMap={this.setDisplayMap} />
+                   toggleDisplay={this.toggleDisplay} setDisplayMap={this.setDisplayMap} hideAll={this.hideAll} showAll={this.showAll} />
         </div>
       </div>
     )
