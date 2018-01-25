@@ -20,6 +20,8 @@ import ReactResizeDetector from 'react-resize-detector';
 
 import io from 'socket.io-client';
 
+import Script from 'react-load-script';
+
 var offlinePin = L.divIcon({className: 'icon-marker bg-true-black'});
 var grayPin = L.divIcon({className: 'icon-marker bg-medium-gray'});
 var darkBluePin = L.divIcon({className: 'icon-marker bg-dark-blue'});
@@ -47,7 +49,7 @@ class PositionRenderer extends Component {
     this._handleTracking = this._handleTracking.bind(this);
     this._handleViewPortChange = this._handleViewPortChange.bind(this);
 
-    this.setTiles = this.setTiles.bind(this);
+    // this.setTiles = this.setTiles.bind(this);
   }
 
   _handleTracking(device_id) {
@@ -117,11 +119,30 @@ class PositionRenderer extends Component {
   }
 
   // this has no counterpart in the frontend
-  setTiles(isMap) {
-    this.setState({isTerrain: isMap});
+  // setTiles(isMap) {
+  //   this.setState({isTerrain: isMap});
+  // }
+
+  componentDidMount() {
+    if (this.leafletMap !== undefined) {
+
+      console.log('will attempt to add layer', MQ.mapLayer, this.leafletMap);
+      // mq = require('..//../external/mq-map.js');
+
+      let mapLayer = MQ.mapLayer();
+      mapLayer.addTo(this.leafletMap.leafletElement);
+
+      L.control.layers({
+        'Map': MQ.mapLayer(),
+        'Hibrid': MQ.hybridLayer(),
+        'Satellite': MQ.satelliteLayer()
+      }).addTo(this.leafletMap.leafletElement);
+    }
   }
 
   render() {
+
+    console.log('will render renderer');
     function getPinColor(p) {
       if (p.status === "offline") {return offlinePin;}
       if (p.sinr === undefined) {return grayPin;}
@@ -163,12 +184,12 @@ class PositionRenderer extends Component {
       null
     )
 
-    const tileURL = this.state.isTerrain ? (
-      'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}'
-    ) : (
-      'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'
-    )
-    const attribution = '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> and Mapbox contributors';
+    // const tileURL = this.state.isTerrain ? (
+    //   'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}'
+    // ) : (
+    //   'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'
+    // )
+    // const attribution = '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> and Mapbox contributors';
 
     return (
       <Map center={this.state.center}
@@ -183,11 +204,11 @@ class PositionRenderer extends Component {
         <LayerBox> </LayerBox>
         {contextMenu}
         <ReactResizeDetector handleWidth onResize={this.resize.bind(this)} />
-        <div className="mapOptions col s12">
+        {/* <div className="mapOptions col s12">
           <div className="mapView" onClick = {() => this.setTiles(true)}>Terrain</div>
           <div className="satelliteView" onClick = {() => this.setTiles(false)}>Satellite</div>
-        </div>
-        <TileLayer url={tileURL} />
+        </div> */}
+        {/* <TileLayer url={tileURL} /> */}
         {/* <TileLayer url={tileURL} attribution={attribution} /> */}
         <LayerAntenna />
         {parsedEntries.map((k) => {
@@ -349,6 +370,7 @@ class DeviceMap extends Component {
     this.state = {
       displayMap:{},
       tracking: {},
+      mapquest: false
     };
 
     this.toggleTracking = this.toggleTracking.bind(this);
@@ -357,6 +379,13 @@ class DeviceMap extends Component {
     this.toggleDisplay = this.toggleDisplay.bind(this);
     this.setDisplay = this.setDisplay.bind(this);
     this.setDisplayMap = this.setDisplayMap.bind(this);
+
+    this.mqLoaded = this.mqLoaded.bind(this);
+  }
+
+  mqLoaded() {
+    console.log('loaded returned');
+    this.setState({mapquest: true});
   }
 
   setOpacity(value){
@@ -438,6 +467,7 @@ class DeviceMap extends Component {
   }
 
   render() {
+    console.log('will render device map', this.state.mapquest);
     let validDevices = 0;
     let validTracking = 0;
     let deviceList = [];
@@ -479,6 +509,7 @@ class DeviceMap extends Component {
     const displayText = "Showing " + validDevices + " of " +
                         Object.keys(this.props.devices).length + " devices"
 
+    console.log(this.state.mapquest);
     return (
       <div className = "flex-wrapper">
         <SubHeader>
@@ -487,7 +518,14 @@ class DeviceMap extends Component {
           {this.props.toggle}
         </SubHeader>
         <div className="deviceMapCanvas deviceMapCanvas-map col m12 s12 relative">
-          <PositionRenderer devices={pointList} toggleTracking={this.toggleTracking} opacity={this.state.opacity} allowContextMenu={true}/>
+          <Script url="https://www.mapquestapi.com/sdk/leaflet/v2.s/mq-map.js?key=zvpeonXbjGkoRqVMtyQYCGVn4JQG8rd9"
+                  onLoad={this.mqLoaded}>
+          </Script>
+          {this.state.mapquest ? (
+            <PositionRenderer devices={pointList} toggleTracking={this.toggleTracking} opacity={this.state.opacity} allowContextMenu={true}/>
+          ) : (
+            null
+          )}
           <SideBar devices={this.props.devices} statusMap={this.state.displayMap}
                    toggleDisplay={this.toggleDisplay} setDisplayMap={this.setDisplayMap} hideAll={this.hideAll} showAll={this.showAll} />
         </div>
