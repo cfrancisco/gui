@@ -27,9 +27,64 @@ class DeviceUserActions extends Component {
     return (
       <div>
         <Link className="waves-effect waves-light btn-flat btn-ciano"
-              to={"/device/list"}  tabIndex="-1"  title="Return to device list">
+              to={"/device/list/" + true}  tabIndex="-1"  title="Return to device list">
           <i className="clickable fa fa-times" />
         </Link>
+        <Link to={"/device/id/" + this.props.deviceid + "/edit"} className="waves-effect waves-light btn-flat btn-ciano" tabIndex="-1" title="Edit device">
+          <i className="clickable fa fa-pencil" />
+        </Link>
+        <a className="waves-effect waves-light btn-flat btn-ciano" tabIndex="-1" title="Remove device"
+           onClick={(e) => {e.preventDefault(); $('#' + this.props.confirmTarget).modal('open');}}>
+          <i className="clickable fa fa-trash"/>
+        </a>
+      </div>
+    )
+  }
+}
+
+class RemoveDialog extends Component {
+  constructor(props) {
+    super(props);
+
+    this.dismiss = this.dismiss.bind(this);
+    this.remove = this.remove.bind(this);
+  }
+
+  componentDidMount() {
+    // materialize jquery makes me sad
+    let modalElement = ReactDOM.findDOMNode(this.refs.modal);
+    $(modalElement).ready(function() {
+      $('.modal').modal();
+    })
+  }
+
+  dismiss(event) {
+    event.preventDefault();
+    let modalElement = ReactDOM.findDOMNode(this.refs.modal);
+    $(modalElement).modal('close');
+  }
+
+  remove(event) {
+    event.preventDefault();
+    let modalElement = ReactDOM.findDOMNode(this.refs.modal);
+    this.props.callback(event);
+    $(modalElement).modal('close');
+  }
+
+  render() {
+    return (
+      <div className="modal modalPosition" id={this.props.target} ref="modal">
+        <div className="modal-content full">
+          <div className="row center background-info">
+            <div><i className="fa fa-exclamation-triangle fa-4x" /></div>
+            <div>You are about to remove this device.</div>
+            <div>Are you sure?</div>
+          </div>
+        </div>
+        <div className="modal-footer right">
+            <button type="button" className="btn-flat btn-ciano waves-effect waves-light" onClick={this.dismiss}>cancel</button>
+            <button type="submit" className="btn-flat btn-red waves-effect waves-light" onClick={this.remove}>remove</button>
+        </div>
       </div>
     )
   }
@@ -247,6 +302,7 @@ class AttributeBox extends Component {
 
     let timeRange = undefined;
     if (attr[0]) {
+      console.log("asd", this.props);
       if (this.props.data.data.hasOwnProperty(this.state.selected)){
         if (this.props.data.data[this.state.selected].length > 0){
           const to = util.iso_to_date(this.props.data.data[this.state.selected][0]['ts']);
@@ -298,6 +354,10 @@ class AttributeBox extends Component {
 function StatusDisplay(props) {
   return (
     <div className="detail-box-body">
+      <div className="metric">
+          <span className="label">ID</span>
+          <span className="value">{props.device.id}</span>
+      </div>
       <div className="metric">
           <span className="label">Attributes</span>
           <span className="value">{props.device.attrs.length + props.device.static_attrs.length}</span>
@@ -558,9 +618,9 @@ class ViewDevice extends Component {
     // this is not good, but will have to make do because of z-index on the action header
     e.preventDefault();
       DeviceActions.triggerRemoval({id: this.props.params.device}, (device) => {
-      hashHistory.push('/device/list');
       Materialize.toast('Device removed', 4000);
     });
+    hashHistory.push('/device/list/' + true);
   }
 
   render() {
@@ -573,6 +633,7 @@ class ViewDevice extends Component {
           <AltContainer store={DeviceMeta} >
             <ViewDeviceImpl device_id={this.props.params.device}/>
           </AltContainer>
+          <RemoveDialog callback={this.remove} target="confirmDiag" />
         </ReactCSSTransitionGroup>
       </div>
     )

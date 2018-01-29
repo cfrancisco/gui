@@ -408,7 +408,7 @@ class UserFormImpl extends Component {
             <div className="lst-user-line col s12 input-field">
               <MaterialInput id="fld_passwd" value={this.props.user.passwd}
                              error={this.props.invalid['passwd']} type="password"
-                             name="passwd" onChange={this.handleChange}>
+                             name="passwd" onChange={this.handleChange} >
                 Password
               </MaterialInput>
             </div>

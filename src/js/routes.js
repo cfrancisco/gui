@@ -24,6 +24,7 @@ export default (
           <IndexRoute component={Devices} />
           <Route path="list" name="Device list" component={Devices} />
           <Route path="map" name="Device list" component={Devices} />
+          <Route path="list/:state" name="Device list" component={Devices} />
           <Route path="new" name="" component={NewDevice} />
           <Route path="id/:device/detail" name="Device detail" component={ViewDevice} />
           <Route path="id/:device/edit" name="Device edit" component={NewDevice} />

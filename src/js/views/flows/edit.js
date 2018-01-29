@@ -300,7 +300,7 @@ class EditFlow extends Component {
           transitionAppear={true} transitionAppearTimeout={500}
           transitionEnterTimeout={500} transitionLeaveTimeout={500} >
         <PageHeader title="flow manager" subtitle="Flow configuration">
-          <div className="row valign-wrapper full-width no-margin">
+          <div className="row valign-wrapper full-width no-margin teste">
             <AltContainer store={FlowStore}>
               <NameForm />
             </AltContainer>

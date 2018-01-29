@@ -37,8 +37,9 @@ function ToggleWidget(props) {
 }
 
 class Devices extends Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
+
 
     this.state = {displayList: false};
     this.toggleDisplay = this.toggleDisplay.bind(this);
@@ -50,8 +51,8 @@ class Devices extends Component {
     this.setState({displayList: !last});
   }
 
-
   componentDidMount() {
+    this.setState({displayList: this.props.params.state});
     DeviceActions.fetchDevices.defer();
   }
 

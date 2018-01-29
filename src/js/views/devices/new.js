@@ -207,13 +207,20 @@ class CreateDeviceActions extends Component {
     if (ongoingOps == false) {
       this.props.operator(JSON.parse(JSON.stringify(DeviceFormStore.getState().device)));
     }
+          console.log("CreateDeviceActions");
+  }
+
+  back(e) {
+    e.preventDefault();
+
+    hashHistory.push('/device/list/' + true)
   }
 
   render() {
     return (
       <div>
         <a className="waves-effect waves-light btn-flat btn-ciano" onClick={this.save} tabIndex="-1">save</a>
-        <Link to="/device/list" className="waves-effect waves-light btn-flat btn-ciano" tabIndex="-1">dismiss</Link>
+        <a className="waves-effect waves-light btn-flat btn-ciano" onClick={this.back} tabIndex="-1">dismiss</a>
       </div>
     )
   }
@@ -578,16 +585,17 @@ class NewDevice extends Component {
     let ops = function(device) {
       DeviceActions.addDevice(device, (device) => {
         FormActions.set(device);
-        hashHistory.push('/device/id/' + device.id + '/edit')
         Materialize.toast('Device created', 4000);
       });
+      hashHistory.push('/device/list/' + true);
     }
     if (this.props.params.device) {
       title = "Edit device";
       ops = function(device) {
-        DeviceActions.triggerUpdate(device, () => {
-          Materialize.toast('Device updated', 4000);
+        DeviceActions.triggerUpdate(device, (device) => {
         });
+        Materialize.toast('Device updated', 4000);
+        hashHistory.push('/device/list/' + true);
       }
     }
 

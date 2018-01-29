@@ -112,6 +112,8 @@ class DeviceList extends Component {
 
     // TODO refactor this away
     let filteredList = []
+
+    console.log("list", this.props);
     if ((this.props.devices !== undefined) && (this.props.devices !== null)) {
       for (let k in this.props.devices) {
         if (this.props.devices.hasOwnProperty(k) && this.shouldShow(k)){
@@ -129,6 +131,11 @@ class DeviceList extends Component {
             <SubHeaderItem text={"Showing "+ filteredList.length + " devices "}
                            icon={device_icon} active='false' clickable='false' />
             {this.props.toggle}
+            <div className="box-sh">
+              <Link to="/device/new" title="Create a new device" className="waves-effect waves-light btn-flat">
+                New Device
+              </Link>
+            </div>
           </SubHeader>
 
           <div className="deviceMapCanvas col m12 s12 relative">
@@ -137,25 +144,27 @@ class DeviceList extends Component {
                 { filteredList.map((device, idx) => <SummaryItem device={device} key={device.id}/>) }
               </div>
             </div>
-              <SideBar devices={this.props.devices}
-                       setDisplayMap={this.setDisplayMap}
-                       hideAll={this.hideAll}
-                       showAll={this.showAll}
-                       toggleDisplay={this.toggleDisplay}
-                       statusMap={this.state.displayMap}/>
           </div>
         </div>
       )
     } else {
       return  (
-        <div className="background-info valign-wrapper full-height relative">
-          <span className="horizontal-center">No configured devices</span>
-          <SideBar devices={this.props.devices}
-                   setDisplayMap={this.setDisplayMap}
-                   hideAll={this.hideAll}
-                   showAll={this.showAll}
-                   toggleDisplay={this.toggleDisplay}
-                   statusMap={this.state.displayMap}/>
+        <div className = "flex-wrapper bg-light-gray">
+          {/* TODO refactor this to a different file */}
+          <SubHeader>
+            <SubHeaderItem text={"Showing "+ filteredList.length + " devices "}
+                           icon={device_icon} active='false' clickable='false' />
+            {this.props.toggle}
+            <div className="box-sh">
+              <Link to="/device/new" title="Create a new device" className="waves-effect waves-light btn-flat">
+                New Device
+              </Link>
+            </div>
+          </SubHeader>
+
+          <div className="background-info valign-wrapper full-height relative">
+            <span className="horizontal-center">No configured devices</span>
+          </div>
         </div>
       )
     }

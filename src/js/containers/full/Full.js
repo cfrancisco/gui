@@ -203,7 +203,7 @@ class Sidebar extends Component {
   render() {
     let entries = [
       { target: "/device", iconClass: "material-icons mi-ic-memory", label: "Devices", desc: "Known devices and configuration", children: [
-        // { target: "/device/list", iconClass: "", label: "device", title: "Devices list", siblings: ['/device/id', '/device/new']},
+         //{ target: "/device/list", iconClass: "", label: "device", title: "Devices list", siblings: ['/device/id', '/device/new']}
         // { target: "/template/list", iconClass: "", label: "template", title: "Templates list", siblings: ['/template/id', '/template/new']},
         // { target: "/alarm?q=device", iconClass: "", label: "alarm", title: "Alarms list"}
       ]},
