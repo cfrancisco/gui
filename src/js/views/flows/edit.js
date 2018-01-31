@@ -229,6 +229,7 @@ class RemoveDialog extends Component {
   }
 
   remove() {
+    this.props.closeRemoveDialog();
     FlowActions.triggerRemove(this.props.id, () => {
       let modalElement = ReactDOM.findDOMNode(this.refs.modal);
       $(modalElement).modal('close');
@@ -239,13 +240,14 @@ class RemoveDialog extends Component {
 
   dismiss(event) {
     event.preventDefault();
-    let modalElement = ReactDOM.findDOMNode(this.refs.modal);
-    $(modalElement).modal('close');
+    // let modalElement = ReactDOM.findDOMNode(this.refs.modal);
+    // $(modalElement).modal('close');
+    this.props.closeRemoveDialog();
   }
 
   render() {
     return (
-      <div className="modal" id={this.props.target} ref="modal">
+      <div className="modal removeDialog" id={this.props.target} ref="modal">
         <div className="modal-content full">
           <div className="row center background-info">
             <div><i className="fa fa-exclamation-triangle fa-4x" /></div>
@@ -284,6 +286,18 @@ class NameForm extends Component {
 class EditFlow extends Component {
   constructor(props) {
     super(props);
+    this.state = { showRemoveDialog: false };
+    this.openRemoveBox = this.openRemoveBox.bind(this);
+    this.closeRemoveBox = this.closeRemoveBox.bind(this);
+  }
+
+  openRemoveBox() {
+    this.setState({ showRemoveDialog: true });
+  }
+
+  closeRemoveBox()
+  {
+   this.setState({ showRemoveDialog: false });
   }
 
   componentDidMount() {
@@ -295,37 +309,41 @@ class EditFlow extends Component {
   }
 
   render() {
-    return (
-      <ReactCSSTransitionGroup transitionName="first"
-          transitionAppear={true} transitionAppearTimeout={500}
-          transitionEnterTimeout={500} transitionLeaveTimeout={500} >
+    return <ReactCSSTransitionGroup transitionName="first" transitionAppear={true} transitionAppearTimeout={500} transitionEnterTimeout={500} transitionLeaveTimeout={500}>
         <PageHeader title="flow manager" subtitle="Flow configuration">
           <div className="row valign-wrapper full-width no-margin teste">
             <AltContainer store={FlowStore}>
               <NameForm />
             </AltContainer>
             <div className="col">
-              <a className="waves-effect waves-light btn-flat btn-ciano"
-                  onClick={() => { handleSave(this.props.params.flowid); }} >
+              <a className="waves-effect waves-light btn-flat btn-ciano" onClick={() => {
+                  handleSave(this.props.params.flowid);
+                }}>
                 save
               </a>
             </div>
-            {(this.props.params.flowid) && (
-              <div className="col">
-                <button className="waves-effect waves-light btn-flat btn-red" data-target="confirmDiag">remove</button>
-              </div>
-            )}
+            {this.props.params.flowid && <div className="col">
+                <button className="waves-effect waves-light btn-flat btn-red" onClick={() => {
+                    this.openRemoveBox();
+                  }}>
+                  remove
+                </button>
+              </div>}
             <div className="col">
-              <Link to="/flows" className="waves-effect waves-light btn-flat btn-ciano">Dismiss</Link>
+              <Link to="/flows" className="waves-effect waves-light btn-flat btn-ciano">
+                Dismiss
+              </Link>
             </div>
           </div>
         </PageHeader>
         <AltContainer store={FlowStore}>
-          <FlowCanvas flow={this.props.params.flowid}/>
+          <FlowCanvas flow={this.props.params.flowid} />
         </AltContainer>
-        <RemoveDialog id={this.props.params.flowid} target="confirmDiag"/>
-      </ReactCSSTransitionGroup>
-    );
+        <div className={this.state.showRemoveDialog ? "blackBackground" : ""} onClick={() => {
+            this.closeRemoveBox();
+          }} />
+        {this.state.showRemoveDialog && <RemoveDialog closeRemoveDialog={this.closeRemoveBox} id={this.props.params.flowid} target="confirmDiag" />}
+      </ReactCSSTransitionGroup>;
   }
 }
 

@@ -1183,3 +1183,20 @@ h1, h2, p {
 .modalPosition {
   margin-top: 15% !important;
 }
+
+.blackBackground
+{
+  height:100vh;
+  width:100%;
+  background:rgba(0, 0, 0, 0.58);
+  top: 0px;
+  left: 0px;
+  position: fixed;
+  z-index: 1016;
+}
+
+.removeDialog{
+  display: inline-block !important;
+  top: 100px;
+  z-index: 1017 !important;
+}

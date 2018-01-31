@@ -477,13 +477,6 @@ class DeviceDetail extends Component {
 
     this.state = {
       selected_attributes: [
-        "rssi",
-        "sinr",
-        "alt",
-        "rpm",
-        "oilTemperature",
-        "fuelLevel",
-        "speed"
       ]
     }
 
