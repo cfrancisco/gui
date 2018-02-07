@@ -25,6 +25,109 @@ import MaterialSelect from "../../components/MaterialSelect";
 import io from 'socket.io-client';
 
 
+class DeviceHeader extends Component {
+  constructor(props) {
+    super(props);
+  }
+
+  render() {
+    return (
+      <div className="row devicesSubHeader p0 device-details-header" >
+        <div className="col s4 m4 device-label"> {this.props.device.label} </div>
+        <div className="col s8 m8 infos">
+          <div className="title">Last Update</div>
+          <div className="value">{this.props.device.last_update}
+          </div>
+        </div>
+      </div>
+    );
+  }
+}
+
+
+
+class Attribute extends Component {
+  constructor(props) {
+    super(props);
+      this.state = {
+      opened: false,
+    };
+    this.toogleExpand = this.toogleExpand.bind(this);
+  }
+
+  componentDidMount(){
+   MeasureActions.fetchMeasure(this.props.device, this.props.device.id, this.props.device.templates, this.props.attr.id, 250);
+  }
+ 
+
+  toogleExpand(state) {
+    this.setState({opened: state});
+  }
+
+  render() {
+    console.log("attrs", this.props.attr,this.props.expand);
+
+    return 
+    <div className={"attribute-box " + (this.state.opened ? "expanded" : "compressed")}>
+      <div className="header">
+        <label>{this.props.attr.label}</label>
+        {this.state.opened ? <i onClick={this.toogleExpand.bind(this, true)} class="fas fa-expand" /> : <i onClick={this.toogleExpand.bind(this, false)} class="fas fa-compress" />}
+      </div>
+      {/* <AltContainer store={MeasureStore} inject={{ device: device }}> */}
+      {/* <AttributeBox attrs={this.state.selected_attributes} /> */}
+      {/* </AltContainer> */}
+      <div className="body">
+        <AttrHistory device={this.props.device} type={this.props.attr.value_type} attr={this.props.attr.label} />
+      </div>
+    </div>;
+  }
+}
+
+
+
+
+
+
+class StaticAttributes extends Component {
+  constructor(props) {
+    super(props);
+  }
+
+  render() {
+
+    console.log("attrs", this.props.attrs);
+
+    return (
+      <div className="row stt-attributes">
+        <div className="col s12 header">
+            <div class="icon"><img src="images/tag.png"></img></div>
+            <label>Static Attributes</label>
+        </div>
+        <div className="col s12 body">
+            {
+                this.props.attrs.map((attr) =>
+                  <div key={attr.label} className="line">
+                    <div className="col s4">
+                          <div className="name-value">Name</div>
+                    </div>
+                    <div className="col s4">
+                          <div className="value-value">Value</div>
+                    </div>
+                    <div className="col s4">
+                          <div className="template-value">Template</div>
+                          <div className="template-label">Template</div>
+                    </div>
+                  </div>
+                  )
+              }
+        </div>
+      </div>
+    );
+  }
+}
+
+
+
 class RemoveDialog extends Component {
   constructor(props) {
     super(props);
@@ -538,48 +641,79 @@ class DeviceDetail extends Component {
     super(props);
 
     this.state = {
-      selected_attributes: [
-        //"ts",
-        //"temperature",
-        //'sinr'
-      ]
+      selected_attrs: []
     };
-
-    this.onChange = this.onChange.bind(this);
+    // this.onChange = this.onChange.bind(this);
   }
 
-  onChange(attrs) {
-    MeasureActions.fetchMeasure.defer(this.props.deviceid,this.props.devices[this.props.deviceid].templates, attrs, 1);
-    this.setState({selected_attributes: attrs});
-  }
+  // onChange(attrs) {
+  //   MeasureActions.fetchMeasure.defer(this.props.deviceid,this.props.device.templates, attrs, 1);
+  //   this.setState({ selected_attrs: attrs });
+  // }
 
   render() {
-    const device = this.props.devices[this.props.deviceid];
 
-     return (
-      <div className="row detail-body">
-        <div className="col s3 detail-box full-height">
-          <div className="detail-box-header">General</div>
-            <HeaderWrapper device={device} />
-          <AttrSelector device = {device}
-                        attrs={device.attrs}
-                        selected={this.state.selected_attributes}
-                        onChange={this.onChange} />
-        </div>
-        <div className="col s9 device-map full-height">
-          <div className="col s12 device-map-box">
-            <AltContainer store={DeviceStore} >
-              <PositionWrapper device={device}/>
-            </AltContainer>
-          </div>
-          <div className="col s12 p0 data-box full-height">
-            <AltContainer store={MeasureStore} inject={{device: device}}>
-              <AttributeBox attrs={this.state.selected_attributes}/>
-            </AltContainer>
-          </div>
-        </div>
-      </div>
-    )
+
+     console.log("device : ",this.props.device);
+     let attr_list = [];
+     for (let index in this.props.device.attrs)
+     {
+       let tmp = this.props.device.attrs[index];
+       attr_list = attr_list.concat(tmp.filter(i => {
+         return String(i.type) == "static";
+       }));
+     };
+     console.log(attr_list);
+
+     return <div className="row detail-body">
+         <div className="first-col full-height">
+           <div className=" device-map">
+             <div className="col s12 device-map-box">
+               <AltContainer store={DeviceStore}>
+                 <PositionWrapper device={this.props.device} />
+               </AltContainer>
+             </div>
+           </div>
+           <StaticAttributes device={this.props.device} attrs={attr_list} />
+           {/* <Configurations device={this.props.device} /> */}
+         </div>
+         <div className="second-col">
+           {
+              this.state.selected_attrs.map((at) =>
+                  <Attribute device={this.props.device} attr={at}>
+                  </Attribute>
+              )
+          }
+         </div>
+         <div className="third-col">
+           Attributes
+         </div>
+        
+
+       </div>;
+
+       // <div className="row detail-body">
+       //   <div className="col s3 detail-box full-height">
+       //     <div className="detail-box-header">General</div>
+       //       <HeaderWrapper device={device} />
+       //     <AttrSelector device = {device}
+       //                   attrs={device.attrs}
+       //                   selected={this.state.selected_attributes}
+       //                   onChange={this.onChange} />
+       //   </div>
+       //   <div className="col s9 device-map full-height">
+       //     <div className="col s12 device-map-box">
+       //       <AltContainer store={DeviceStore} >
+       //         <PositionWrapper device={device}/>
+       //       </AltContainer>
+       //     </div>
+       //     <div className="col s12 p0 data-box full-height">
+       //       <AltContainer store={MeasureStore} inject={{device: device}}>
+       //         <AttributeBox attrs={this.state.selected_attributes}/>
+       //       </AltContainer>
+       //     </div>
+       //   </div>
+       //  </div> */}
   }
 }
 
@@ -653,10 +787,11 @@ class ViewDeviceImpl extends Component {
       return (<Loading />);
     }
 
+    console.log("device, ",device);
     return (
       <div className="full-height bg-light-gray">
       <NewPageHeader title="Devices" subtitle="device manager" icon="device">
-          <div className="box-sh box-sh-2">
+          {/* <div className="box-sh box-sh-2">
             <label> Viewing Device </label> <div className="device_name">{device.label}</div>
           </div>
           <div className="box-sh">
@@ -666,10 +801,12 @@ class ViewDeviceImpl extends Component {
             <AltContainer store={DeviceStore}>
               <ConnectivityStatus device_id={device.id} />
             </AltContainer>
-          </div>
+          </div> */}
           <RemoveDialog callback={this.remove} target="confirmDiag" />
         </NewPageHeader>
-        <DeviceDetail deviceid={device.id} devices={this.props.devices}/>
+        <DeviceHeader device={device}>
+        </DeviceHeader> 
+        <DeviceDetail deviceid={device.id} device={device}/>
       </div>
     )
   }
