@@ -4,7 +4,7 @@ import L from "leaflet";
 // import * as L from "leaflet";
 import Script from 'react-load-script';
 import Sidebar from '../../components/DeviceRightSidebar';
-import { SmallPositionRenderer } from "../../components/Maps";
+import { SmallPositionRenderer, BigPositionRenderer } from "../../components/Maps";
 
 
 let listLatLngs = [];
@@ -170,112 +170,96 @@ class DeviceMapSmall extends Component {
          }
 
         console.log("Devices: pointList: ", pointList);
-        return <div className="fix-map-bug">
-            <div className="flex-wrapper">
-              <div className="deviceMapCanvas deviceMapCanvas-map col m12 s12 relative">
-                {/* <Script url="https://www.mapquestapi.com/sdk/leaflet/v2.s/mq-map.js?key=zvpeonXbjGkoRqVMtyQYCGVn4JQG8rd9" onLoad={this.mqLoaded} /> */}
-                {/* {this.state.mapquest ? */}
-                     <SmallPositionRenderer devices={pointList} toggleTracking={this.toggleTracking} allowContextMenu={true} listPositions={this.props.tracking} showPolyline={true} /> 
-                     {/* : 
-                     <div className="row full-height relative">
-                    <div className="background-info valign-wrapper full-height">
-                      <i className="fa fa-circle-o-notch fa-spin fa-fw horizontal-center" />
-                    </div>
-                  </div>} */}
-                    <Sidebar deviceInfo={displayDevicesCount} toggleVisibility={this.toggleVisibility} devices={this.validDevices} hideAll={this.hideAll} showAll={this.showAll} displayMap={this.state.displayMap} />
-              </div>
-            </div>
-          </div>;
-    }
+        return  <div>
+            <SmallPositionRenderer devices={pointList} toggleTracking={this.toggleTracking} allowContextMenu={true} listPositions={this.props.tracking} showPolyline={true} /> 
+            {/* : 
+            <div className="row full-height relative">
+        <div className="background-info valign-wrapper full-height">
+            <i className="fa fa-circle-o-notch fa-spin fa-fw horizontal-center" />
+        </div>
+        </div>} */}
+        <Sidebar deviceInfo={displayDevicesCount} toggleVisibility={this.toggleVisibility} devices={this.validDevices} hideAll={this.hideAll} showAll={this.showAll} displayMap={this.state.displayMap} />
+        </div>
+        }   
 }
 
 
 
 class DeviceMapBig extends Component {
-    constructor(props) {
-        super(props);
+  constructor(props) {
+    super(props);
 
-        this.state = {
-            area: {},
-            zoom: 18
-        };
+    this.state = {
+      corners: { topLeft: 100, topRight: 100, bottomLeft: 0, bottomRight: 0 },
+      zoom: 18
+    };
 
-        this.getDevicesWithPosition = this.getDevicesWithPosition.bind(this);
-    }
+    // this.splitInClusters = this.splitInClusters.bind(this);
+    this.handleGeoDevices = this.handleGeoDevices.bind(this);
+    this.markerList = [];
+    this.clusterers = {};
+  }
 
-    componentDidMount() {
-        console.log("DeviceMapBig: componentDidMount.");
-    }
+  componentDidMount() {
+    console.log("DeviceMapBig: componentDidMount, props: ", this.props);
+  }
 
-    getDevicesWithPosition(devices) {
+//   splitInClusters()
+//   {
+//       let markers = this.markerList;
+//       console.log("splitInClusters", markers);
+//         let clusterers = {};
+//         let numberof = (markers.length%20000);
+//         for (let index = 0; index < numberof; index++)
+//         {
+//             clusterers[index] = markers.slice(index, index*numberof);
+//         }
+//         return clusterers;
+//  }
 
-        console.log("DeviceMapBig: getDevicesWithPosition", devices);
-        function parserPosition(position) {
-            let parsedPosition = position.split(",");
-            return [parseFloat(parsedPosition[0]), parseFloat(parsedPosition[1])];
+  handleGeoDevices() {
+    console.log("DeviceMapBig: handleGeoDevices", this.props);
+    this.clusterers = [];
+    // step 1. Create elements to set on markers
+    this.props.clusterers.map((element, i1) => {
+        let clstr = {index:i1,devices:[]};
+        element.devices.map((element, index) => {
+        console.log("element.geo.lat", element.geo);
+        if (element.geo !== undefined) {
+            clstr.devices.push({
+              id: element.id,
+              lat: element.geo.lat,
+              lng: element.geo.lng,
+              pos: [
+                parseFloat("-23.5373"),
+                parseFloat("-46.6293")
+              ],
+              label: element.label,
+              timestamp: element.timestamp,
+              key: element.id
+            });
         }
+        });
+        this.clusterers.push(clstr);
+    });
+    console.log("this.clusterers", this.clusterers);
 
-        let validDevices = [];
-        for (let k in devices) {
-            for (let j in devices[k].attrs) {
-                for (let i in devices[k].attrs[j]) {
-                    if (devices[k].attrs[j][i].type === "static") {
-                        if (devices[k].attrs[j][i].value_type === "geo:point") {
-                            devices[k].position = parserPosition(devices[k].attrs[j][i].static_value);
-                        }
-                    }
-                }
-            }
+    // this.clusterers = this.splitInClusters();
+  }
 
-            devices[k].select = this.showSelected(k);
-            if (devices[k].position !== null && devices[k].position !== undefined) {
-                validDevices.push(devices[k]);
-            }
-        }
-        return validDevices;
-    }
+  render() {
+    this.handleGeoDevices();
+    // let displayDevicesCount = "Showing " + filteredList.length + " device(s)";
 
-    render() {
-        this.validDevices = this.getDevicesWithPosition(this.props.devices);
-        let filteredList = this.validDevices;
-
-        const displayDevicesCount = "Showing " + this.validDevices.length + " device(s)";
-
-        let pointList = [];
-        for (let k in filteredList) {
-            let device = filteredList[k];
-            device.hasPosition = device.hasOwnProperty('position');
-            if (this.props.tracking.hasOwnProperty(device.id) && this.state.displayMap[device.id]) {
-                pointList = pointList.concat(this.props.tracking[device.id].map((e, k) => {
-                    let updated = e;
-                    updated.id = device.id;
-                    updated.unique_key = device.id + "_" + k;
-                    updated.label = device.label;
-                    updated.timestamp = e.timestamp;
-                    return updated;
-                }));
-            }
-            if (this.state.displayMap[device.id])
-                pointList.push(device);
-        }
-
-
-        return <div className="fix-map-bug">
-            <div className="flex-wrapper">
-                <div className="deviceMapCanvas deviceMapCanvas-map col m12 s12 relative">
-                    {/* <Script url="https://www.mapquestapi.com/sdk/leaflet/v2.s/mq-map.js?key=zvpeonXbjGkoRqVMtyQYCGVn4JQG8rd9" onLoad={this.mqLoaded} /> */}
-                    {/* {this.state.mapquest ? */}
-                    <SmallPositionRenderer devices={pointList} toggleTracking={this.toggleTracking} allowContextMenu={true} listPositions={this.props.tracking} showPolyline={true} />
-                    {/* : 
-                     <div className="row full-height relative">
-                    <div className="background-info valign-wrapper full-height">
-                      <i className="fa fa-circle-o-notch fa-spin fa-fw horizontal-center" />
-                    </div>
-                  </div>} */}
-                </div>
-            </div>
-        </div>;
-    }
+    return (
+      <BigPositionRenderer
+        devices={this.props.devices}
+        allowContextMenu={true}
+        // positions={this.markerList}
+        clusterers={this.clusterers}
+      />
+    );
+  }
 }
 
 export { DeviceMapSmall, DeviceMapBig };

@@ -1,8 +1,14 @@
 import React, { Component } from 'react';
 import DeviceStore from '../../stores/DeviceStore';
-import MeasureStore from '../../stores/MeasureStore';
 import DeviceActions from '../../actions/DeviceActions';
+
+import MeasureStore from '../../stores/MeasureStore';
 import MeasureActions from '../../actions/MeasureActions';
+
+import GeoDeviceStore from "../../stores/GeoDeviceStore";
+import GeoDeviceActions from "../../actions/GeoDeviceActions";
+
+
 import { NewPageHeader } from "../../containers/full/PageHeader";
 import AltContainer from 'alt-container';
 import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
@@ -45,30 +51,38 @@ class MapWrapper extends Component {
   }
 
   componentDidMount(){
-    let devices = this.props.devices;
-    for(let deviceID in devices){
-      for(let templateID in devices[deviceID].attrs){
-        for(let attrID in devices[deviceID].attrs[templateID]){
-          if(devices[deviceID].attrs[templateID][attrID].type === "dynamic"){
-            if(devices[deviceID].attrs[templateID][attrID].value_type === "geo:point"){
-                MeasureActions.fetchPosition.defer(devices[deviceID], devices[deviceID].id, devices[deviceID].attrs[templateID][attrID].label);
-            }
-          }
-        }
-      }
-    }
+    let corners = {};
+    GeoDeviceActions.fetchDevices.defer(corners);
+    // let devices = this.props.devices;
+    // for(let deviceID in devices){
+    //   for(let templateID in devices[deviceID].attrs){
+    //     for(let attrID in devices[deviceID].attrs[templateID]){
+    //       if(devices[deviceID].attrs[templateID][attrID].type === "dynamic"){
+    //         if(devices[deviceID].attrs[templateID][attrID].value_type === "geo:point"){
+    //             MeasureActions.fetchPosition.defer(devices[deviceID], devices[deviceID].id, devices[deviceID].attrs[templateID][attrID].label);
+    //         }
+    //       }
+    //     }
+    //   }
+    // }
   }
 
   render(){
-    console.log("this.props.deviceList", this.props.deviceList);
-    if (this.props.deviceList.length < 1000)
-    return <AltContainer store={MeasureStore}>
-        <DeviceMapSmall devices={this.props.devices} showFilter={this.props.showFilter} dev_opex={this.props.dev_opex} />
-      </AltContainer>;
-    else
-    return <AltContainer store={MeasureStore}>
-        <DeviceMapBig devices={this.props.devices} showFilter={this.props.showFilter} dev_opex={this.props.dev_opex} />
-      </AltContainer>;
+    // console.log("this.props.deviceList", this.props.deviceList);
+    
+    return <div className="fix-map-bug">
+      <div className="flex-wrapper">
+        <div className="deviceMapCanvas deviceMapCanvas-map col m12 s12 relative">
+          <AltContainer store={GeoDeviceStore}>
+            {(this.props.deviceList.length > 1000) ?
+              <DeviceMapSmall devices={this.props.devices} showFilter={this.props.showFilter} dev_opex={this.props.dev_opex} />
+              :
+              <DeviceMapBig devices={this.props.devices} showFilter={this.props.showFilter} dev_opex={this.props.dev_opex} /> 
+            }
+          </AltContainer>
+        </div>
+      </div>
+    </div>
   }
 }
 

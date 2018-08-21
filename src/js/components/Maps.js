@@ -2,14 +2,172 @@ import React, { Component } from 'react';
 import { Link } from 'react-router'
 import { Map, Marker, ImageOverlay, TileLayer, Tooltip, ScaleControl, Polyline } from 'react-leaflet';
 import L from "leaflet";
-// import * as L from "leaflet";
-import ReactResizeDetector from 'react-resize-detector';
 import config from '../config'
 import DivIcon from 'react-leaflet-div-icon';
+import {cluster} from 'node-libs-browser';
+
+require('leaflet.markercluster');
+
 
 let trackingPin = <DivIcon className='icon-marker bg-tracking-marker'></DivIcon>
 // let trackingPin = DivIcon({className: 'icon-marker bg-tracking-marker'});
 let listLatLngs = [];
+
+
+class ContextMenu {
+  constructor() {
+    console.log("ContextMenu loaded.");
+  }
+
+  // context menu based at
+  // https://codepen.io/devhamsters/pen/yMProm
+  updateCurrentContextMenu(event) {
+    console.log("updateCurrentContextMenu");
+    const clickX = event.clientX;
+    const clickY = event.clientY;
+    const screenW = window.innerWidth;
+    const screenH = window.innerHeight;
+    const rootW = this.root.offsetWidth;
+    const rootH = this.root.offsetHeight;
+
+    const right = screenW - clickX > rootW;
+    const left = !right;
+    const top = screenH - clickY > rootH;
+    const bottom = !top;
+    if (right) this.root.style.left = `${clickX + 5}px`;
+    if (left) this.root.style.left = `${clickX - rootW - 5}px`;
+    if (top) this.root.style.top = `${clickY + 5}px`;
+    if (bottom) this.root.style.top = `${clickY - rootH - 5}px`;
+  }
+}
+
+class CustomMap extends Component {
+  constructor(props) {
+    super(props);
+    this.map = null;
+    this.clusters = {};
+    this.updateClusters = this.updateClusters.bind(this);
+      this.createCluster = this.createCluster.bind(this);
+  }
+
+  componentDidMount() {
+    console.log("CustomMap: componentDidMount");
+    // create map
+    this.map = L.map("map", {
+      center: [49.8419, 24.0315],
+      zoom: 16,
+      layers: [
+        L.tileLayer("http://{s}.tile.osm.org/{z}/{x}/{y}.png", {
+          attribution:
+            '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+        })
+      ]
+    });
+
+    // add layer
+    // this.layer = L.layerGroup().addTo(this.map);
+    // this.updateMarkers(this.props.markersData);
+    // this.clusters = {};
+  }
+
+  updateClusters(clusterIndex, markersData) {
+    console.log("updateClusters", clusterIndex, markersData);
+  }
+
+  createCluster(devicesData)
+  {
+      var markerList = [];
+      for (var i = 0; i < devicesData.length; i++) {
+          var dev = devicesData[i];
+        //   var marker = L.marker(L.latLng(a[0], a[1]), {
+        //       title: title
+        //   });
+        //   dev.lat, dev.lng
+           var marker = L.marker(L.latLng(dev.pos), {
+              title: dev.label
+          });
+          // marker.bindPopup(title);
+          markerList.push(marker);
+      }
+      return L.markerClusterGroup({
+          chunkedLoading: true
+      }).addLayers(markerList);
+  }
+
+
+  componentDidUpdate() {
+
+    console.log("componentDidUpdate: clustererData", this.props.clustererData);
+    //   let markerList = markersData;
+    //   if (markersData === undefined)
+    //   {
+        //   markerList = [];
+    //   }
+    //   clustererData
+      this.clusters = {};
+      this.props.clustererData.map((element, i1) => {
+        this.clusters[element.index] = this.createCluster(element.devices);
+        this.map.addLayer(this.clusters[element.index]);
+      })
+    // check if data has changed
+    // if (this.props.markersData !== markersData) {
+    //   this.updateMarkers(this.props.markersData);
+    // }
+  }
+
+//   updateMarkers(markersData) {
+//     this.layer.clearLayers();
+//     markersData.forEach(marker => {
+//       L.marker(marker.latLng, { title: marker.title }).addTo(this.layer);
+//     });
+//   }
+
+  render() {
+    console.log("CustomMap - Render: ", this.props);
+    return <div id="map" />;
+  }
+}
+
+
+// Refs:
+// https://medium.com/@cherniavskii/creating-leaflet-maps-in-react-apps-e2750372d6d6
+
+class BigPositionRenderer extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            corners: { topLeft: 100, topRight: 100, bottomLeft: 0, bottomRight: 0 },
+            selectedDeviceId: -1,
+            contextMenuVisibity: false,
+            center: (this.props.center ? this.props.center : [-21.277057, -47.9590129]),
+            zoom: (this.props.zoom ? this.props.zoom : 10)
+        };
+        this.contextMenu = new ContextMenu();
+        this.handleContextMenu = this.handleContextMenu.bind(this);
+    }
+
+   
+    handleContextMenu(e, device_id) {
+        let event = e.originalEvent;
+        event.preventDefault();
+        if (!this.props.allowContextMenu) {
+            return false;
+        }
+        this.setState({
+          contextMenuVisibity: true,
+          selectedDeviceId: device_id
+        });
+        // this.refs.map.leafletElement.locate()
+        this.contextMenu.updateCurrentContextMenu(event);
+    };
+
+    render() {
+        console.log("BigPositionRenderer: Props: ", this.props);
+
+        return <CustomMap center={this.state.center} clustererData={this.props.clusterers} positionData={this.props.positions} deviceData={this.props.devices} zoom={this.state.zoom}>
+          </CustomMap>;
+    }
+}
 
 
 
@@ -243,5 +401,5 @@ class LayerBox extends Component {
 
 
 
-export { SmallPositionRenderer };
+export { SmallPositionRenderer, BigPositionRenderer };
 

@@ -1,0 +1,59 @@
+{
+	"clusterers": [{
+		"cluster_id": "1",
+		"qty": 5,
+		"devices": [{
+			"timestamp": 1532525375822,
+			"id": "7706bb",
+			"label": "dev1",
+			"status": "offline",
+			"geo": {
+				"lat": "‎-23.5371",
+				"lng": "‎-46.6291"
+			}
+		},
+        {
+			"timestamp": 1532525375822,
+			"id": "7706b2",
+			"label": "dev2",
+			"status": "offline",
+			"geo": {
+				"lat": "‎-23.5372",
+				"lng": "‎-46.6292"
+			}
+		},
+        {
+			"timestamp": 1532525375822,
+			"id": "7706b3",
+			"label": "dev3",
+			"status": "offline",
+			"geo": {
+				"lat": "‎-23.5373",
+				"lng": "‎-46.6293"
+			}
+		},
+        {
+			"timestamp": 1532525375822,
+			"id": "7706b4",
+			"label": "dev4",
+			"status": "offline",
+			"geo": {
+				"lat": "‎-23.5374",
+				"lng": "‎-46.6294"
+			}
+		},
+        {
+			"timestamp": 1532525375822,
+			"id": "7706b5",
+			"label": "dev5",
+			"status": "offline",
+			"geo": {
+				"lat": "‎-23.533775",
+				"lng": "‎-46.625295"
+			}
+		}]
+	}]
+}
+
+
+
