@@ -615,3 +615,19 @@
     font-size: 16px !important;
   }
 }
+
+
+.line-2{
+
+  width: calc(100% - 40px);
+  height: 2px;
+  display: block;
+  border: 1px solid #C4C4C4;
+  margin-left: 40px;
+}
+
+
+.image-block
+{
+  padding: 10px 0 40px 0;
+}

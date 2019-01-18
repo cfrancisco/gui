@@ -1,29 +1,26 @@
-/* eslint-disable */
-import imageManager from '../comms/ImageManager';
-import toaster from '../comms/util/materialize';
+import imageManager from 'Comms/ImageManager';
+import toaster from 'Comms/util/materialize';
 
 const alt = require('../alt');
-
-// console.log('ImageActions');
 
 class ImageActions {
     updateImages(images) {
         return images;
     }
 
-    // fetchImages() {
-    //   return (dispatch) => {
-    //     dispatch();
+    fetchImages(template_id) {
+      return (dispatch) => {
+        dispatch();
 
-    //     imageManager.getImages().then((imageList) => {
-    //       console.log("imageManager.getImages()",imageList);
-    //       this.updateImages(imageList);
-    //     })
-    //     .catch((error) => {
-    //       this.imagesFailed(error);
-    //     });
-    //   }
-    // }
+        imageManager.getImages(template_id).then((imageList) => {
+          console.log("imageManager.getImages()",imageList);
+          this.updateImages(imageList);
+        })
+        .catch((error) => {
+          this.imagesFailed(error);
+        });
+      }
+    }
 
 
     triggerUpdate(image, cb) {
@@ -66,8 +63,13 @@ class ImageActions {
     }
 
 
-    insertImage(image) {
+    insertEmptyImage(image) {
         return image;
+    }
+
+
+    insertImage(image, oldimage) {
+        return image, oldimage;
     }
 
     triggerInsert(image, cb) {
@@ -76,9 +78,9 @@ class ImageActions {
             dispatch();
             imageManager.addImage(newimage)
                 .then((response) => {
-                    this.insertImage(response);
+                    this.insertImage(response, newimage);
                     if (cb) {
-                        cb(response);
+                        cb(response, newimage);
                     }
                 })
                 .catch((error) => {
@@ -92,7 +94,7 @@ class ImageActions {
             dispatch();
             imageManager.deleteBinary(image_id)
                 .then((response) => {
-                    // console.log('response', response);
+                    console.log('response', response);
                     if (response.result == 'ok') {
                         this.removeSingleBinary(image_id);
                         if (cb) {

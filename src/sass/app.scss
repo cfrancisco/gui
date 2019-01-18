@@ -283,20 +283,33 @@ body {
   padding-top: 20px !important;
 }
 
+.pb10px, .pb10
+{
+  padding-bottom: 10px !important;
+}
+
 .pb20px, .pb20
 {
   padding-bottom: 20px !important;
-}
-
-.pl40px, .pl40
-{
-  padding-left: 40px !important;
 }
 
 .pl30px, .pl30
 {
   padding-left: 30px !important;
 }
+
+.pl40px, .pl40
+{
+  padding-left: 40px !important;
+}  
+
+
+.pl50px, .pl50
+{
+  padding-left: 50px !important;
+}
+
+
 
 
 .pull-right
@@ -403,6 +416,11 @@ order: 1;
 .height-auto
 {
   height: auto !important;
+}
+
+.height-50
+{
+  height: 50px !important;
 }
 
 .fl{

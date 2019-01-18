@@ -11,6 +11,7 @@ const SidebarTemplate = ({
     showSidebar,
     toogleSidebar,
     toogleSidebarAttribute,
+    toogleSidebarFirmware,
     changeValue,
     saveTemplate,
     updateTemplate,
@@ -36,6 +37,7 @@ const SidebarTemplate = ({
                         <SidebarForm
                             template={template}
                             toogleSidebarAttribute={toogleSidebarAttribute}
+                            toogleSidebarFirmware={toogleSidebarFirmware}
                             changeValue={changeValue}
                         />
                         <div className="footer">
@@ -75,6 +77,7 @@ SidebarTemplate.propTypes = {
     showSidebar: PropTypes.bool,
     toogleSidebar: PropTypes.func.isRequired,
     toogleSidebarAttribute: PropTypes.func.isRequired,
+    toogleSidebarFirmware: PropTypes.func.isRequired,
     changeValue: PropTypes.func.isRequired,
     saveTemplate: PropTypes.func.isRequired,
     updateTemplate: PropTypes.func.isRequired,

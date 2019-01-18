@@ -181,6 +181,7 @@
     display: flex;
     justify-content: space-between;
     flex-direction: column;
+    overflow-x: hidden;
     flex:1;
     padding: 10px 0;
     .body-attribute-name{
@@ -541,3 +542,17 @@
   flex-wrap: wrap !important;
   flex-direction: column !important;
 }
+
+
+
+.img-hash-icon
+{
+  position: absolute;
+  right: 20px;
+  top: 18px;
+  font-size: 20px;
+  color: darkgray;
+  cursor: pointer;
+}
+
+

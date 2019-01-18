@@ -48,6 +48,16 @@ const DojotBtnClassic = ({ type = "secondary", color = 'none', title, onClick, l
     );
 }
 
+const DojotBtnClassicWithIcon = ({title, onClick, label, icon}) => {
+    let auxTitle = title;
+    if (auxTitle == undefined)
+        auxTitle = label;
+    return (
+        <button type="button" title={auxTitle} onClick={onClick} className={`new-btn-flat style-2 secondary`}>
+        <i className={`fa ${icon} withIcon`} />&nbsp;{label} 
+        </button>
+    );
+}
 
 class DojotButton extends Component {
     constructor(props) {
@@ -121,7 +131,7 @@ const DojotCustomButton = ({ type = "default", onClick, label }) => (
 
 export {
     DojotBtnRedCircle, DojotBtnCircle,
-    DojotBtnClassic,
+    DojotBtnClassic, DojotBtnClassicWithIcon, 
     DojotBtnLink,
     DojotButton,
     DojotCustomButton
