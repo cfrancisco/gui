@@ -22,7 +22,7 @@ function createAttribute(label, type, valueType, staticValue) {
 
 function createImageAttribute(data, type) {
     const aux = createAttribute(data.user_value, type, 'string', '');
-    aux.metadata = [createAttribute(data.dojot_value, 'meta', 'bool', true)];
+    aux.metadata = [createAttribute(data.dojot_value, 'meta', 'boolean', true)];
     return aux;
 }
 
@@ -93,7 +93,6 @@ class SidebarFirmConfig extends Component {
 
     saveImageConfig(e) {
         e.preventDefault();
-
         const { template } = this.props;
         const { attrs } = this.state;
         template.attrs.push(createImageAttribute(attrs.current_state, 'dynamic'));
@@ -116,7 +115,6 @@ class SidebarFirmConfig extends Component {
             attrs,
         });
     }
-
 
     render() {
         const {
