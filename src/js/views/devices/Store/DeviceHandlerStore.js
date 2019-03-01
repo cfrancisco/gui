@@ -44,8 +44,8 @@ class DeviceHandlerStore {
     fetch() {}
 
     set(device) {
-        this.templateIdAllowedImage = '1';
-        this.hasTemplateWithImages = true;
+        this.templateIdAllowedImage = '';
+        this.hasTemplateWithImages = false;
         if (device === null || device === undefined) {
             this.device = {
                 label: '',
