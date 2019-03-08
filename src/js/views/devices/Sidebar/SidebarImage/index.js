@@ -175,7 +175,7 @@ class SidebarImage extends Component {
                 <Slide right when={showSidebarImage} duration={300}>
                     { showSidebarImage
                         ? (
-                            <div className="-sidebar sidebar-attribute sidebar-firmware">
+                            <div className="sidebar-firmware">
                                 <div className="header">
                                     <div className="title">Firmware</div>
                                     <div className="icon">
@@ -187,37 +187,39 @@ class SidebarImage extends Component {
                                 </div>
 
                                 <div className="body box-image-info">
-                                    <div className="info firmware-enabled">
-                                        <div className="icon">
-                                            <img src="images/icons/firmware-gray.png" alt="device-icon" />
-                                        </div>
-                                        <div className="desc">
-                                            <div className="line">
-                                                <div className="label">Current Version</div>
-                                                <div className="value">{attrs.current_version}</div>
+                                    <div className="sub-content">
+                                        <div className="info firmware-enabled">
+                                            <div className="icon">
+                                                <img src="images/icons/firmware-big-gray.png" alt="device-icon" />
                                             </div>
-                                            <div className="line">
-                                                <div className="label">Current State</div>
-                                                <div className="value">{attrs.current_state}</div>
-                                            </div>
-                                            <div className="line">
-                                                <div className="label">Update Result</div>
-                                                <div className="value">{attrs.update_result}</div>
+                                            <div className="desc">
+                                                <div className="line">
+                                                    <div className="label">Current Version</div>
+                                                    <div className="value">{attrs.current_version}</div>
+                                                </div>
+                                                <div className="line">
+                                                    <div className="label">Current State</div>
+                                                    <div className="value">{attrs.current_state}</div>
+                                                </div>
+                                                <div className="line">
+                                                    <div className="label">Update Result</div>
+                                                    <div className="value">{attrs.update_result}</div>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                    <div className="line-2" />
-                                    <div className="body-form pl50">
-                                        <div className="header2">Image to be transferred</div>
-                                        <div className="cid_select">
-                                            <MaterialSelect id="flr_images" name="images" label="Available images" value={this.currentImageId} onChange={e => this.onChangeImage(e)}>
-                                                {opts}
-                                            </MaterialSelect>
-                                        </div>
-                                        <div className="cid_upload_button">
-                                            <div className="square-button" onKeyPress={this.callUploadImage} tabIndex="0" role="button" onClick={this.callUploadImage}>
-                                                <i className="fa fa-download fa-2x" />
-                                                Transfer
+                                        <div className="line-2" />
+                                        <div className="body-form pl50">
+                                            <div className="header2">Image to be transferred</div>
+                                            <div className="cid_select">
+                                                <MaterialSelect id="flr_images" name="images" label="Available images" value={this.currentImageId} onChange={e => this.onChangeImage(e)}>
+                                                    {opts}
+                                                </MaterialSelect>
+                                            </div>
+                                            <div className="cid_upload_button">
+                                                <div className="square-button" onKeyPress={this.callUploadImage} tabIndex="0" role="button" onClick={this.callUploadImage}>
+                                                    <i className="fa fa-download fa-2x" />
+                                                    Transfer
+                                                </div>
                                             </div>
                                         </div>
                                     </div>

@@ -97,3 +97,22 @@
     width: calc(100% - 108px);
     display: inline-block;
 }
+
+
+.sidebar-firmware
+{
+  @extend .generic-sidebar;
+  .header{
+      background: linear-gradient(96.69deg, #813C9A 0%, #E96D71 99.09%) !important;
+  }
+  .body{
+    .sub-content
+    {
+      height: calc(100% - 58px);
+    }
+    .body-form{
+      padding-bottom: 50px;
+      height: auto;
+    }
+  }
+}

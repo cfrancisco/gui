@@ -42,11 +42,11 @@ const SidebarDevice = ({
                                     <div className="icon">
                                         <img src="images/icons/chip-cyan.png" alt="device-icon" />
                                     </div>
-                                </div>
-                                <div className="body">
-                                    <div className="title">
+                                    <div className="header-path">
                                         {t('devices:device')}
                                     </div>
+                                </div>
+                                <div className="body">
 
                                     <div className="device-name">
                                         <div className="label">

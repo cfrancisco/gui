@@ -119,7 +119,7 @@ class DeviceCardListComponent extends Component {
                         </span>
                     </div>
                 ) : (
-                    <div className="col s12  lst-wrapper extra-padding flex-container">
+                    <div className="col s12 lst-wrapper w100 hei-100-over-scroll">
                         {this.filteredList.map(device => (
                             <SummaryItem device={device} key={device.id} t={t}/>
                         ))}

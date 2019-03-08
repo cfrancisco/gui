@@ -15,21 +15,6 @@ import SidebarImage from './SidebarImage/index';
 import { FormActions } from '../Actions';
 
 
-// function handleTemplateWithImages(device) {
-//     console.log('Templates', device.templates);
-//     // create a code here to check if template is a template allowed to receive images;
-//     if (device.templates) {
-//         return {
-//             templateIdAllowedImage: device.templates[0],
-//             hasTemplateWithImages: true,
-//         };
-//     }
-//     return {
-//         templateIdAllowedImage: '',
-//         hasTemplateWithImages: false,
-//     };
-// }
-
 class Sidebar extends Component {
     constructor(props) {
         super(props);
@@ -62,8 +47,6 @@ class Sidebar extends Component {
     }
 
     static getDerivedStateFromProps(props, state) {
-        // const tempWithImages = handleTemplateWithImages(props.device);
-        // ...tempWithImages,
         if (props.showSidebarDevice !== state.showSidebarDevice) {
             return {
                 ...state,

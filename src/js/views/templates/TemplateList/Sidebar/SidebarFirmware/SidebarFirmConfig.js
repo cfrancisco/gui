@@ -126,7 +126,7 @@ class SidebarFirmConfig extends Component {
                 <Slide right when={showFirmware} duration={300}>
                     { showFirmware
                         ? (
-                            <div className="generic-sidebar sidebar-firmware">
+                            <div className="sidebar-firmware">
                                 <div className="header">
                                     <div className="title">Firmware</div>
                                     <div className="icon">
@@ -138,7 +138,13 @@ class SidebarFirmConfig extends Component {
                                 </div>
 
                                 <div className="body box-firmware-enabled">
-                                    <div tabIndex="0" role="button" onKeyPress={this.changeFirmwareState} onClick={this.changeFirmwareState} className={`firmware-enabled clickable z-depth-2 card-hover ${clssBtn}`}>
+                                <div className="sub-content">
+                                    <div 
+                                        tabIndex="0"
+                                        role="button" 
+                                        onKeyPress={this.changeFirmwareState}
+                                        onClick={this.changeFirmwareState} 
+                                        className={`firmware-enabled clickable z-depth-2 card-hover ${clssBtn}`}>
                                         <div className="icon">
                                             <img src="images/firmware-red.png" alt="device-icon" />
                                         </div>
@@ -219,7 +225,8 @@ class SidebarFirmConfig extends Component {
                                                 </div>
                                             </div>
                                         )
-                                        : <div className="image-related-attrs" /> }
+                                        : null }
+                                    </div>
                                     <div className="body-actions">
                                         <div className="body-actions--divider" />
                                         <SidebarButton
