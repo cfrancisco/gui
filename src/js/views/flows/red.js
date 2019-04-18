@@ -1709,8 +1709,22 @@ RED.nodes = (function() {
         var nodeSets = {};
         var typeToId = {};
         var nodeDefinitions = {};
+        var iconSets = {};
+
+        nodeDefinitions['tab'] = {
+            defaults: {
+                label: {value:""},
+                disabled: {value: false},
+                info: {value: ""}
+            }
+        };
+
 
         var exports = {
+            setModulePendingUpdated: function(module,version) {
+                moduleList[module].pending_version = version;
+                RED.events.emit("registry:module-updated",{module:module,version:version});
+            },
             getModule: function(module) {
                 return moduleList[module];
             },
@@ -1747,6 +1761,9 @@ RED.nodes = (function() {
                     local:ns.local,
                     sets:{}
                 };
+                if (ns.pending_version) {
+                    moduleList[ns.module].pending_version = ns.pending_version;
+                }
                 moduleList[ns.module].sets[ns.name] = ns;
                 RED.events.emit("registry:node-set-added",ns);
             },
@@ -1784,7 +1801,8 @@ RED.nodes = (function() {
             },
             registerNodeType: function(nt,def) {
                 nodeDefinitions[nt] = def;
-                if (def.category != "subflows") {
+                def.type = nt;
+                if (nt.substring(0,8) != "subflow:") {
                     def.set = nodeSets[typeToId[nt]];
                     nodeSets[typeToId[nt]].added = true;
                     nodeSets[typeToId[nt]].enabled = true;
@@ -1797,10 +1815,15 @@ RED.nodes = (function() {
                     }
                     def["_"] = function() {
                         var args = Array.prototype.slice.call(arguments, 0);
+                        var original = args[0];
                         if (args[0].indexOf(":") === -1) {
                             args[0] = ns+":"+args[0];
                         }
-                        return RED._.apply(null,args);
+                        var result = RED._.apply(null,args);
+                        if (result === args[0]) {
+                            result = original;
+                        }
+                        return result;
                     }
 
                     // TODO: too tightly coupled into palette UI
@@ -1817,18 +1840,27 @@ RED.nodes = (function() {
             },
             getNodeType: function(nt) {
                 return nodeDefinitions[nt];
+            },
+            setIconSets: function(sets) {
+                iconSets = sets;
+                iconSets["font-awesome"] = RED.nodes.fontAwesome.getIconList();
+            },
+            getIconSets: function() {
+                return iconSets;
             }
         };
         return exports;
     })();
 
     function getID() {
-        return ('A' + (1+Math.random()*4294967295).toString(16)).replace('.','');
+        return (1+Math.random()*4294967295).toString(16);
     }
 
     function addNode(n) {
         if (n.type.indexOf("subflow") !== 0) {
             n["_"] = n._def._;
+        } else {
+            n["_"] = RED._;
         }
         if (n._def.category == "config") {
             configNodes[n.id] = n;
@@ -1910,10 +1942,19 @@ RED.nodes = (function() {
                 if (updatedConfigNode) {
                     RED.workspaces.refresh();
                 }
+                try {
+                    if (node._def.oneditdelete) {
+                        node._def.oneditdelete.call(node);
+                    }
+                } catch(err) {
+                    console.log("oneditdelete",node.id,node.type,err.toString());
+                }
                 RED.events.emit('nodes:remove',node);
             }
         }
         if (node && node._def.onremove) {
+            // Deprecated: never documented but used by some early nodes
+            console.log("Deprecated API warning: node type ",node.type," has an onremove function - should be oneditremove - please report");
             node._def.onremove.call(n);
         }
         return {links:removedLinks,nodes:removedNodes};
@@ -1926,15 +1967,14 @@ RED.nodes = (function() {
         }
     }
 
-    function addWorkspace(ws) {
+    function addWorkspace(ws,targetIndex) {
         workspaces[ws.id] = ws;
-        ws._def = {
-            defaults: {
-                label: {value:""}
-            }
-        };
-
-        workspacesOrder.push(ws.id);
+        ws._def = RED.nodes.getType('tab');
+        if (targetIndex === undefined) {
+            workspacesOrder.push(ws.id);
+        } else {
+            workspacesOrder.splice(targetIndex,0,ws.id);
+        }
     }
     function getWorkspace(id) {
         return workspaces[id];
@@ -1985,32 +2025,37 @@ RED.nodes = (function() {
             });
             sf.name = subflowName;
         }
-        sf._def = {
-            defaults:{},
-            icon:"subflow.png",
-            category: "subflows",
-            color: "#da9",
-            inputs: sf.in.length,
-            outputs: sf.out.length
-        }
         subflows[sf.id] = sf;
         RED.nodes.registerType("subflow:"+sf.id, {
-            defaults:{name:{value:""}},
-            info: sf.info,
-            icon:"subflow.png",
-            category: "subflows",
+            defaults:{
+                name:{value:""},
+                env:{value:[]}
+            },
+            icon: function() { return sf.icon||"subflow.png" },
+            category: sf.category || "subflows",
             inputs: sf.in.length,
             outputs: sf.out.length,
             color: "#da9",
             label: function() { return this.name||RED.nodes.subflow(sf.id).name },
             labelStyle: function() { return this.name?"node_label_italic":""; },
             paletteLabel: function() { return RED.nodes.subflow(sf.id).name },
+            inputLabels: function(i) { return sf.inputLabels?sf.inputLabels[i]:null },
+            outputLabels: function(i) { return sf.outputLabels?sf.outputLabels[i]:null },
+            oneditresize: function(size) {
+                var rows = $("#dialog-form>div:not(.node-input-env-container-row)");
+                var height = size.height;
+                for (var i=0; i<rows.size(); i++) {
+                    height -= $(rows[i]).outerHeight(true);
+                }
+                var editorRow = $("#dialog-form>div.node-input-env-container-row");
+                height -= (parseInt(editorRow.css("marginTop"))+parseInt(editorRow.css("marginBottom")));
+                $("#node-input-env-container").editableList('height',height-80);
+            },
             set:{
                 module: "node-red"
             }
         });
-
-
+        sf._def = RED.nodes.getType("subflow:"+sf.id);
     }
     function getSubflow(id) {
         return subflows[id];
@@ -2087,6 +2132,7 @@ RED.nodes = (function() {
         node.id = n.id;
         node.type = n.type;
         node.z = n.z;
+
         if (node.type == "unknown") {
             for (var p in n._orig) {
                 if (n._orig.hasOwnProperty(p)) {
@@ -2131,9 +2177,33 @@ RED.nodes = (function() {
             for (var j=0;j<wires.length;j++) {
                 var w = wires[j];
                 if (w.target.type != "subflow") {
-                    node.wires[w.sourcePort].push(w.target.id);
+                    if (w.sourcePort < node.wires.length) {
+                        node.wires[w.sourcePort].push(w.target.id);
+                    }
                 }
             }
+
+            if (n.inputs > 0 && n.inputLabels && !/^\s*$/.test(n.inputLabels.join("")))  {
+                node.inputLabels = n.inputLabels.slice();
+            }
+            if (n.outputs > 0 && n.outputLabels && !/^\s*$/.test(n.outputLabels.join(""))) {
+                node.outputLabels = n.outputLabels.slice();
+            }
+            if ((!n._def.defaults || !n._def.defaults.hasOwnProperty("icon")) && n.icon) {
+                var defIcon = RED.utils.getDefaultNodeIcon(n._def, n);
+                if (n.icon !== defIcon.module+"/"+defIcon.file) {
+                    node.icon = n.icon;
+                }
+            }
+            if ((!n._def.defaults || !n._def.defaults.hasOwnProperty("l")) && n.hasOwnProperty('l')) {
+                var isLink = /^link (in|out)$/.test(node.type);
+                if (isLink == n.l) {
+                    node.l = n.l;
+                }
+            }
+        }
+        if (n.info) {
+            node.info = n.info;
         }
         return node;
     }
@@ -2144,8 +2214,10 @@ RED.nodes = (function() {
         node.type = n.type;
         node.name = n.name;
         node.info = n.info;
+        node.category = n.category;
         node.in = [];
         node.out = [];
+        node.env = n.env;
 
         n.in.forEach(function(p) {
             var nIn = {x:p.x,y:p.y,wires:[]};
@@ -2171,16 +2243,39 @@ RED.nodes = (function() {
             node.out.push(nOut);
         });
 
+        if (node.in.length > 0 && n.inputLabels && !/^\s*$/.test(n.inputLabels.join("")))  {
+            node.inputLabels = n.inputLabels.slice();
+        }
+        if (node.out.length > 0 && n.outputLabels && !/^\s*$/.test(n.outputLabels.join(""))) {
+            node.outputLabels = n.outputLabels.slice();
+        }
+        if (n.icon) {
+            if (n.icon !== "node-red/subflow.png") {
+                node.icon = n.icon;
+            }
+        }
+        if (n.status) {
+            node.status = {x: n.status.x, y: n.status.y, wires:[]};
+            links.forEach(function(d) {
+                if (d.target === n.status) {
+                    if (d.source.type != "subflow") {
+                        node.status.wires.push({id:d.source.id, port:d.sourcePort})
+                    } else {
+                        node.status.wires.push({id:n.id, port:0})
+                    }
+                }
+            });
+        }
 
         return node;
     }
     /**
      * Converts the current node selection to an exportable JSON Object
      **/
-    function createExportableNodeSet(set) {
+    function createExportableNodeSet(set, exportedSubflows, exportedConfigNodes) {
         var nns = [];
-        var exportedConfigNodes = {};
-        var exportedSubflows = {};
+        exportedConfigNodes = exportedConfigNodes || {};
+        exportedSubflows = exportedSubflows || {};
         for (var n=0;n<set.length;n++) {
             var node = set[n];
             if (node.type.substring(0,8) == "subflow:") {
@@ -2194,7 +2289,7 @@ RED.nodes = (function() {
                             subflowSet.push(n);
                         }
                     });
-                    var exportableSubflow = createExportableNodeSet(subflowSet);
+                    var exportableSubflow = createExportableNodeSet(subflowSet, exportedSubflows, exportedConfigNodes);
                     nns = exportableSubflow.concat(nns);
                 }
             }
@@ -2253,42 +2348,39 @@ RED.nodes = (function() {
     }
 
     function checkForMatchingSubflow(subflow,subflowNodes) {
+        subflowNodes = subflowNodes || [];
         var i;
         var match = null;
-        try {
-            RED.nodes.eachSubflow(function(sf) {
-                if (sf.name != subflow.name ||
-                    sf.info != subflow.info ||
-                    sf.in.length != subflow.in.length ||
-                    sf.out.length != subflow.out.length) {
-                        return;
-                }
-                var sfNodes = RED.nodes.filterNodes({z:sf.id});
-                if (sfNodes.length != subflowNodes.length) {
+        RED.nodes.eachSubflow(function(sf) {
+            if (sf.name != subflow.name ||
+                sf.info != subflow.info ||
+                sf.in.length != subflow.in.length ||
+                sf.out.length != subflow.out.length) {
                     return;
-                }
+            }
+            var sfNodes = RED.nodes.filterNodes({z:sf.id});
+            if (sfNodes.length != subflowNodes.length) {
+                return;
+            }
 
-                var subflowNodeSet = [subflow].concat(subflowNodes);
-                var sfNodeSet = [sf].concat(sfNodes);
+            var subflowNodeSet = [subflow].concat(subflowNodes);
+            var sfNodeSet = [sf].concat(sfNodes);
 
-                var exportableSubflowNodes = JSON.stringify(subflowNodeSet);
-                var exportableSFNodes = JSON.stringify(createExportableNodeSet(sfNodeSet));
-                var nodeMap = {};
-                for (i=0;i<sfNodes.length;i++) {
-                    exportableSubflowNodes = exportableSubflowNodes.replace(new RegExp("\""+subflowNodes[i].id+"\"","g"),'"'+sfNodes[i].id+'"');
-                }
-                exportableSubflowNodes = exportableSubflowNodes.replace(new RegExp("\""+subflow.id+"\"","g"),'"'+sf.id+'"');
+            var exportableSubflowNodes = JSON.stringify(subflowNodeSet);
+            var exportableSFNodes = JSON.stringify(createExportableNodeSet(sfNodeSet));
+            var nodeMap = {};
+            for (i=0;i<sfNodes.length;i++) {
+                exportableSubflowNodes = exportableSubflowNodes.replace(new RegExp("\""+subflowNodes[i].id+"\"","g"),'"'+sfNodes[i].id+'"');
+            }
+            exportableSubflowNodes = exportableSubflowNodes.replace(new RegExp("\""+subflow.id+"\"","g"),'"'+sf.id+'"');
 
-                if (exportableSubflowNodes !== exportableSFNodes) {
-                    return;
-                }
+            if (exportableSubflowNodes !== exportableSFNodes) {
+                return;
+            }
 
-                match = sf;
-                throw new Error();
-            });
-        } catch(err) {
-            console.log(err.stack);
-        }
+            match = sf;
+            return false;
+        });
         return match;
     }
     function compareNodes(nodeA,nodeB,idMustMatch) {
@@ -2343,7 +2435,23 @@ RED.nodes = (function() {
         if (!$.isArray(newNodes)) {
             newNodes = [newNodes];
         }
+
+        // Scan for any duplicate nodes and remove them. This is a temporary
+        // fix to help resolve corrupted flows caused by 0.20.0 where multiple
+        // copies of the flow would get loaded at the same time.
+        // If the user hit deploy they would have saved those duplicates.
+        var seenIds = {};
+        newNodes = newNodes.filter(function(n) {
+            if (seenIds[n.id]) {
+                return false;
+            }
+            seenIds[n.id] = true;
+            return true;
+        })
+
+        var isInitialLoad = false;
         if (!initialLoad) {
+            isInitialLoad = true;
             initialLoad = JSON.parse(JSON.stringify(newNodes));
         }
         var unknownTypes = [];
@@ -2357,7 +2465,6 @@ RED.nodes = (function() {
                 n.type.substring(0,8) != "subflow:" &&
                 unknownTypes.indexOf(n.type)==-1) {
                     unknownTypes.push(n.type);
-                    console.log("found unknownTypes: " + n.type);
             }
             if (n.z) {
                 nodeZmap[n.z] = nodeZmap[n.z] || [];
@@ -2365,10 +2472,9 @@ RED.nodes = (function() {
             }
 
         }
-        if (unknownTypes.length > 0) {
+        if (!isInitialLoad && unknownTypes.length > 0) {
             var typeList = "<ul><li>"+unknownTypes.join("</li><li>")+"</li></ul>";
-            var type = "type"+(unknownTypes.length > 1?"s":"");
-            RED.notify("<strong>"+RED._("clipboard.importUnrecognised",{count:unknownTypes.length})+"</strong>"+typeList,"error",false,10000);
+            RED.notify("<p>"+RED._("clipboard.importUnrecognised",{count:unknownTypes.length})+"</p>"+typeList,"error",false,10000);
         }
 
         var activeWorkspace = RED.workspaces.active();
@@ -2426,7 +2532,6 @@ RED.nodes = (function() {
                     workspace_map[n.id] = nid;
                     n.id = nid;
                 }
-
                 addWorkspace(n);
                 RED.workspaces.add(n);
                 new_workspaces.push(n);
@@ -2455,6 +2560,12 @@ RED.nodes = (function() {
                         output.i = i;
                         output.id = getID();
                     });
+                    if (n.status) {
+                        n.status.type = "subflow";
+                        n.status.direction = "status";
+                        n.status.z = n.id;
+                        n.status.id = getID();
+                    }
                     new_subflows.push(n);
                     addSubflow(n,createNewIds);
                 }
@@ -2463,7 +2574,7 @@ RED.nodes = (function() {
 
         // Add a tab if there isn't one there already
         if (defaultWorkspace == null) {
-            defaultWorkspace = { type:"tab", id:getID(), label:RED._('workspace.defaultName',{number:1})};
+            defaultWorkspace = { type:"tab", id:getID(), disabled: false, info:"",  label:RED._('workspace.defaultName',{number:1})};
             addWorkspace(defaultWorkspace);
             RED.workspaces.add(defaultWorkspace);
             new_workspaces.push(defaultWorkspace);
@@ -2516,8 +2627,15 @@ RED.nodes = (function() {
 
                 }
 
-                if (!existingConfigNode) { //} || !compareNodes(existingConfigNode,n,true) || existingConfigNode._def.exclusive || existingConfigNode.z !== n.z) {
-                    configNode = {id:n.id, z:n.z, type:n.type, users:[], _config:{}};
+                if (!existingConfigNode || existingConfigNode._def.exclusive) { //} || !compareNodes(existingConfigNode,n,true) || existingConfigNode.z !== n.z) {
+                    configNode = {
+                        id:n.id,
+                        z:n.z,
+                        type:n.type,
+                        info: n.info,
+                        users:[],
+                        _config:{}
+                    };
                     for (d in def.defaults) {
                         if (def.defaults.hasOwnProperty(d)) {
                             configNode[d] = n[d];
@@ -2551,7 +2669,22 @@ RED.nodes = (function() {
             if (n.type !== "workspace" && n.type !== "tab" && n.type !== "subflow") {
                 def = registry.getNodeType(n.type);
                 if (!def || def.category != "config") {
-                    var node = {x:n.x,y:n.y,z:n.z,type:0,wires:n.wires,changed:false,_config:{}};
+                    var node = {
+                        x:parseFloat(n.x || 0),
+                        y:parseFloat(n.y || 0),
+                        z:n.z,
+                        type:0,
+                        wires:n.wires||[],
+                        inputLabels: n.inputLabels,
+                        outputLabels: n.outputLabels,
+                        icon: n.icon,
+                        info: n.info,
+                        changed:false,
+                        _config:{}
+                    };
+                    if (n.hasOwnProperty('l')) {
+                        node.l = n.l;
+                    }
                     if (createNewIds) {
                         if (subflow_blacklist[n.z]) {
                             continue;
@@ -2600,6 +2733,7 @@ RED.nodes = (function() {
                         node.name = n.name;
                         node.outputs = subflow.out.length;
                         node.inputs = subflow.in.length;
+                        node.env = n.env;
                     } else {
                         if (!node._def) {
                             if (node.x && node.y) {
@@ -2617,6 +2751,13 @@ RED.nodes = (function() {
                                     set: registry.getNodeSet("node-red/unknown")
                                 };
                                 node.users = [];
+                                // This is a config node, so delete the default
+                                // non-config node properties
+                                delete node.x;
+                                delete node.y;
+                                delete node.wires;
+                                delete node.inputLabels;
+                                delete node.outputLabels;
                             }
                             var orig = {};
                             for (var p in n) {
@@ -2629,10 +2770,31 @@ RED.nodes = (function() {
                             node.type = "unknown";
                         }
                         if (node._def.category != "config") {
-                            node.inputs = n.inputs||node._def.inputs;
-                            node.outputs = n.outputs||node._def.outputs;
+                            if (n.hasOwnProperty('inputs')) {
+                                node.inputs = n.inputs;
+                                node._config.inputs = JSON.stringify(n.inputs);
+                            } else {
+                                node.inputs = node._def.inputs;
+                            }
+                            if (n.hasOwnProperty('outputs')) {
+                                node.outputs = n.outputs;
+                                node._config.outputs = JSON.stringify(n.outputs);
+                            } else {
+                                node.outputs = node._def.outputs;
+                            }
+                            if (node.hasOwnProperty('wires') && node.wires.length > node.outputs) {
+                                if (!node._def.defaults.hasOwnProperty("outputs") || !isNaN(parseInt(n.outputs))) {
+                                    // If 'wires' is longer than outputs, clip wires
+                                    console.log("Warning: node.wires longer than node.outputs - trimming wires:",node.id," wires:",node.wires.length," outputs:",node.outputs);
+                                    node.wires = node.wires.slice(0,node.outputs);
+                                } else {
+                                    // The node declares outputs in its defaults, but has not got a valid value
+                                    // Defer to the length of the wires array
+                                    node.outputs = node.wires.length;
+                                }
+                            }
                             for (d in node._def.defaults) {
-                                if (node._def.defaults.hasOwnProperty(d)) {
+                                if (node._def.defaults.hasOwnProperty(d) && d !== 'inputs' && d !== 'outputs') {
                                     node[d] = n[d];
                                     node._config[d] = JSON.stringify(n[d]);
                                 }
@@ -2652,7 +2814,9 @@ RED.nodes = (function() {
                     addNode(node);
                     RED.editor.validateNode(node);
                     node_map[n.id] = node;
-                    if (node._def.category != "config") {
+                    // If an 'unknown' config node, it will not have been caught by the
+                    // proper config node handling, so needs adding to new_nodes here
+                    if (node.type === "unknown" || node._def.category !== "config") {
                         new_nodes.push(node);
                     }
                 }
@@ -2741,6 +2905,19 @@ RED.nodes = (function() {
                 });
                 delete output.wires;
             });
+            if (n.status) {
+                n.status.wires.forEach(function(wire) {
+                    var link;
+                    if (subflow_map[wire.id] && subflow_map[wire.id].id == n.id) {
+                        link = {source:n.in[wire.port], sourcePort:wire.port,target:n.status};
+                    } else {
+                        link = {source:node_map[wire.id]||subflow_map[wire.id], sourcePort:wire.port,target:n.status};
+                    }
+                    addLink(link);
+                    new_links.push(link);
+                });
+                delete n.status.wires;
+            }
         }
 
         RED.workspaces.refresh();
@@ -2834,12 +3011,13 @@ RED.nodes = (function() {
             RED.workspaces.remove(workspaces[id]);
         });
         defaultWorkspace = null;
-
-        RED.nodes.dirty(true);
+        initialLoad = null;
+        RED.nodes.dirty(false);
         RED.view.redraw(true);
         RED.palette.refresh();
         RED.workspaces.refresh();
-        // RED.sidebar.config.refresh();
+        RED.sidebar.config.refresh();
+        RED.sidebar.info.refresh();
 
         // var node_defs = {};
         // var nodes = [];
@@ -2853,6 +3031,64 @@ RED.nodes = (function() {
     }
 
     return {
+        init: function() {
+            RED.events.on("registry:node-type-added",function(type) {
+                var def = registry.getNodeType(type);
+                var replaced = false;
+                var replaceNodes = {};
+                RED.nodes.eachNode(function(n) {
+                    if (n.type === "unknown" && n.name === type) {
+                        replaceNodes[n.id] = n;
+                    }
+                });
+                RED.nodes.eachConfig(function(n) {
+                    if (n.type === "unknown" && n.name === type) {
+                        replaceNodes[n.id] = n;
+                    }
+                });
+
+                var replaceNodeIds = Object.keys(replaceNodes);
+                if (replaceNodeIds.length > 0) {
+                    var reimportList = [];
+                    replaceNodeIds.forEach(function(id) {
+                        var n = replaceNodes[id];
+                        if (configNodes.hasOwnProperty(n.id)) {
+                            delete configNodes[n.id];
+                        } else {
+                            nodes.splice(nodes.indexOf(n),1);
+                        }
+                        reimportList.push(convertNode(n));
+                    });
+
+                    // Remove any links between nodes that are going to be reimported.
+                    // This prevents a duplicate link from being added.
+                    var removeLinks = [];
+                    RED.nodes.eachLink(function(l) {
+                        if (replaceNodes.hasOwnProperty(l.source.id) && replaceNodes.hasOwnProperty(l.target.id)) {
+                            removeLinks.push(l);
+                        }
+                    });
+                    removeLinks.forEach(removeLink);
+
+
+                    RED.view.redraw(true);
+                    var result = importNodes(reimportList,false);
+                    var newNodeMap = {};
+                    result[0].forEach(function(n) {
+                        newNodeMap[n.id] = n;
+                    });
+                    RED.nodes.eachLink(function(l) {
+                        if (newNodeMap.hasOwnProperty(l.source.id)) {
+                            l.source = newNodeMap[l.source.id];
+                        }
+                        if (newNodeMap.hasOwnProperty(l.target.id)) {
+                            l.target = newNodeMap[l.target.id];
+                        }
+                    });
+                    RED.view.redraw(true);
+                }
+            });
+        },
         registry:registry,
         setNodeList: registry.setNodeList,
 
@@ -2861,6 +3097,9 @@ RED.nodes = (function() {
         removeNodeSet: registry.removeNodeSet,
         enableNodeSet: registry.enableNodeSet,
         disableNodeSet: registry.disableNodeSet,
+
+        setIconSets: registry.setIconSets,
+        getIconSets: registry.getIconSets,
 
         registerType: registry.registerNodeType,
         getType: registry.getNodeType,
@@ -2886,31 +3125,41 @@ RED.nodes = (function() {
 
         eachNode: function(cb) {
             for (var n=0;n<nodes.length;n++) {
-                cb(nodes[n]);
+                if (cb(nodes[n]) === false) {
+                    break;
+                }
             }
         },
         eachLink: function(cb) {
             for (var l=0;l<links.length;l++) {
-                cb(links[l]);
+                if (cb(links[l]) === false) {
+                    break;
+                }
             }
         },
         eachConfig: function(cb) {
             for (var id in configNodes) {
                 if (configNodes.hasOwnProperty(id)) {
-                    cb(configNodes[id]);
+                    if (cb(configNodes[id]) === false) {
+                        break;
+                    }
                 }
             }
         },
         eachSubflow: function(cb) {
             for (var id in subflows) {
                 if (subflows.hasOwnProperty(id)) {
-                    cb(subflows[id]);
+                    if (cb(subflows[id]) === false) {
+                        break;
+                    }
                 }
             }
         },
         eachWorkspace: function(cb) {
             for (var i=0;i<workspacesOrder.length;i++) {
-                cb(workspaces[workspacesOrder[i]]);
+                if (cb(workspaces[workspacesOrder[i]]) === false) {
+                    break;
+                }
             }
         },
 
